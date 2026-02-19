@@ -1,0 +1,44 @@
+# 의존성
+node_modules/
+.pnp
+.pnp.js
+
+# 빌드 산출물
+dist/
+build/
+.next/
+out/
+
+# 환경변수 (절대 커밋 금지)
+**/.env
+**/.env.*
+!**/.env.example
+
+# 로컬 캐시/임시파일
+.cache/
+.turbo/
+*.local
+
+# 에디터
+.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 로그
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 타입스크립트 캐시
+*.tsbuildinfo
+tsconfig.tsbuildinfo
