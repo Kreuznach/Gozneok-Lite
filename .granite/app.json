@@ -1,0 +1,9 @@
+{
+  "appName": "gozneok-lite",
+  "permissions": [
+    {
+      "name": "geolocation",
+      "access": "access"
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-import { defineConfig } from '@apps-in-toss/web-framework';
+import { defineConfig } from '@apps-in-toss/web-framework/config';
 
 /**
  * granite.config.ts
@@ -22,12 +22,12 @@ export default defineConfig({
     host: 'localhost',
     port: 5173,
     commands: {
-      dev: 'vite',
-      build: 'vite build',
+      dev: 'pnpm --filter web dev',
+      build: 'pnpm --filter web build',
     },
   },
 
-  outdir: 'dist',
+  outdir: 'apps/web/dist',
 
   /**
    * 권한 선언
