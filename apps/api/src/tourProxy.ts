@@ -15,7 +15,32 @@
  */
 
 import { serverCache, SERVER_TTL } from './cache.js';
-import type { NormalizedPlace } from './dummyData.js';
+
+// ────────────────────────────────────────────────────────
+// 정규화된 장소 타입
+// (dummyData.ts 삭제 후 이곳에서 관리)
+// ────────────────────────────────────────────────────────
+
+export interface NormalizedPlace {
+  contentId: string;
+  contentTypeId: string;
+  title: string;
+  addr1: string;
+  addr2?: string;
+  zipcode?: string;
+  areaCode: string;
+  mapx: number;
+  mapy: number;
+  firstimage?: string;
+  firstimage2?: string;
+  tel?: string;
+  overview?: string;
+  createdtime?: string;
+  modifiedtime?: string;
+  homepage?: string;
+  booktour?: string;
+  telname?: string;
+}
 
 // ────────────────────────────────────────────────────────
 // 환경변수
@@ -251,6 +276,46 @@ export async function fetchPlaceImagesFromTourApi(
     serialnum: item.serialnum ?? '',
   }));
 
-  serverCache.set(cacheKey, result, SERVER_TTL.IMAGES);
-  return result;
+  const sorted = sortPlaceImages(result);
+  serverCache.set(cacheKey, sorted, SERVER_TTL.IMAGES);
+  return sorted;
+}
+
+// ────────────────────────────────────────────────────────
+// 이미지 정렬/필터
+// 화장실·주차장 등 부대시설 이미지를 뒤로 보내고
+// '대표이미지' 태그가 있는 이미지를 최우선 노출
+// ────────────────────────────────────────────────────────
+
+const DEPRIORITIZED_IMG_KEYWORDS = [
+  '화장실', '세면실', '욕실', '주차', '주차장', '창고', '기계실',
+];
+const PRIORITY_IMG_KEYWORDS = ['대표이미지', '대표'];
+
+function sortPlaceImages(images: PlaceImageResult[]): PlaceImageResult[] {
+  if (images.length === 0) return images;
+
+  const priority: PlaceImageResult[] = [];
+  const normal: PlaceImageResult[] = [];
+  const deprioritized: PlaceImageResult[] = [];
+
+  for (const img of images) {
+    const name = img.imgname ?? '';
+    if (PRIORITY_IMG_KEYWORDS.some((kw) => name.includes(kw))) {
+      priority.push(img);
+    } else if (DEPRIORITIZED_IMG_KEYWORDS.some((kw) => name.includes(kw))) {
+      deprioritized.push(img);
+    } else {
+      normal.push(img);
+    }
+  }
+
+  const bySerial = (a: PlaceImageResult, b: PlaceImageResult) =>
+    parseInt(a.serialnum || '0', 10) - parseInt(b.serialnum || '0', 10);
+
+  return [
+    ...priority.sort(bySerial),
+    ...normal.sort(bySerial),
+    ...deprioritized.sort(bySerial),
+  ];
 }

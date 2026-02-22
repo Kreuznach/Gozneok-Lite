@@ -8,8 +8,14 @@
 import type { Place, PlaceDetail, PlaceImage, PaginatedResponse, ApiResponse } from '@/types';
 import { memoryCache, TTL } from './cache';
 
-/** 프록시 API 기본 URL (개발: vite proxy → 프로덕션: 환경변수) */
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '/api';
+/** 프록시 API 기본 URL (개발: vite proxy → 프로덕션: 환경변수)
+ *
+ * ⚠️ Toss 미니앱(WebView) 배포 시 반드시 VITE_API_BASE_URL 설정 필요:
+ *   - 미설정 시 기본값 '/api' (상대 경로) → Toss CDN 호스트 기준 해석 → API 호출 실패
+ *   - 빌드 전 apps/web/.env.local 에 VITE_API_BASE_URL=https://your-api-server.com 으로 설정
+ *   - Toss 테스트 환경에서 데이터가 로드되지 않는다면 이 설정을 먼저 확인하세요
+ */
+const API_BASE = import.meta.env['VITE_API_BASE_URL'] ?? '/api';
 
 async function fetchJSON<T>(url: string): Promise<T> {
   const res = await fetch(url, {

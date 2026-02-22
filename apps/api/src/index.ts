@@ -9,7 +9,6 @@
 
 import express from 'express';
 import cors from 'cors';
-import { DUMMY_PLACES } from './dummyData.js';
 import {
   fetchPlaceListFromTourApi,
   fetchPlaceDetailFromTourApi,
@@ -39,19 +38,11 @@ app.use(
 app.use(express.json());
 
 // ────────────────────────────────────────────────────────
-// 더미 데이터 스위치
-// ────────────────────────────────────────────────────────
-
-function useDummyData(): boolean {
-  return process.env['USE_DUMMY_DATA'] === 'true';
-}
-
-// ────────────────────────────────────────────────────────
 // 헬스체크
 // ────────────────────────────────────────────────────────
 
 app.get('/health', (_req, res) => {
-  res.json({ status: 'ok', dummy: useDummyData() });
+  res.json({ status: 'ok' });
 });
 
 // ────────────────────────────────────────────────────────
@@ -60,42 +51,15 @@ app.get('/health', (_req, res) => {
 
 app.get('/api/places', async (req, res) => {
   const area = req.query['area'] as string | undefined;
-  const timeSlot = req.query['timeSlot'] as string | undefined;
   const pageNo = parseInt(req.query['pageNo'] as string ?? '1', 10);
   const numOfRows = parseInt(req.query['numOfRows'] as string ?? '20', 10);
-
-  if (useDummyData()) {
-    // 더미 폴백
-    const filtered = area
-      ? DUMMY_PLACES.filter((p) => p.areaCode === area)
-      : DUMMY_PLACES;
-    const start = (pageNo - 1) * numOfRows;
-    const items = filtered.slice(start, start + numOfRows);
-    return res.json({
-      items,
-      totalCount: filtered.length,
-      pageNo,
-      numOfRows,
-      isFallback: true,
-    });
-  }
 
   try {
     const result = await fetchPlaceListFromTourApi({ area, pageNo, numOfRows });
     return res.json(result);
   } catch (err) {
-    console.error('[/api/places] TourAPI 오류, 더미 폴백 반환:', err instanceof Error ? err.message : String(err));
-    // 장애 시 더미 폴백
-    const filtered = area
-      ? DUMMY_PLACES.filter((p) => p.areaCode === area)
-      : DUMMY_PLACES;
-    return res.json({
-      items: filtered.slice(0, numOfRows),
-      totalCount: filtered.length,
-      pageNo,
-      numOfRows,
-      isFallback: true,
-    });
+    console.error('[/api/places] TourAPI 오류:', err instanceof Error ? err.message : String(err));
+    return res.status(502).json({ error: '장소 목록을 가져오지 못했어요' });
   }
 });
 
@@ -105,12 +69,6 @@ app.get('/api/places', async (req, res) => {
 
 app.get('/api/places/:contentId', async (req, res) => {
   const { contentId } = req.params;
-
-  if (useDummyData() || contentId.startsWith('dummy-')) {
-    const place = DUMMY_PLACES.find((p) => p.contentId === contentId);
-    if (!place) return res.status(404).json({ error: '장소를 찾을 수 없어요' });
-    return res.json({ data: place, isFallback: true });
-  }
 
   try {
     const data = await fetchPlaceDetailFromTourApi(contentId);
@@ -128,10 +86,6 @@ app.get('/api/places/:contentId', async (req, res) => {
 app.get('/api/places/:contentId/images', async (req, res) => {
   const { contentId } = req.params;
 
-  if (useDummyData() || contentId.startsWith('dummy-')) {
-    return res.json([]); // 더미 이미지 없음
-  }
-
   try {
     const images = await fetchPlaceImagesFromTourApi(contentId);
     return res.json(images);
@@ -148,6 +102,5 @@ app.get('/api/places/:contentId/images', async (req, res) => {
 // ────────────────────────────────────────────────────────
 
 app.listen(PORT, () => {
-  console.log(`[API] Gozneok Lite 프록시 서버 시작: http://localhost:${PORT}`);
-  console.log(`[API] 더미 데이터 모드: ${useDummyData() ? 'ON' : 'OFF'}`);
+  console.log(`[API] 고요한 산책 프록시 서버 시작: http://localhost:${PORT}`);
 });

@@ -8,6 +8,7 @@ import { useWishlist } from '@/lib/wishlistContext';
 import { PageHeader } from '@/components/PageHeader';
 import { PageLoader } from '@/components/Skeletons';
 import { EmptyState } from '@/components/EmptyState';
+import { ImageViewer } from '@/components/ImageViewer';
 import type { PlaceDetail, PlaceImage } from '@/types';
 
 export default function PlaceDetailPage() {
@@ -19,6 +20,8 @@ export default function PlaceDetailPage() {
   const [images, setImages] = useState<PlaceImage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  /** 이미지 미리보기 모달: 열린 이미지의 인덱스, null이면 닫힘 */
+  const [viewerIndex, setViewerIndex] = useState<number | null>(null);
 
 
 
@@ -115,7 +118,11 @@ export default function PlaceDetailPage() {
           height: '240px',
           background: '#f2f4f6',
           overflow: 'hidden',
+          cursor: displayImages[0] ? 'zoom-in' : 'default',
         }}
+        onClick={() => displayImages[0] && setViewerIndex(0)}
+        role={displayImages[0] ? 'button' : undefined}
+        aria-label={displayImages[0] ? '이미지 크게 보기' : undefined}
       >
         {displayImages[0] ? (
           <img
@@ -158,12 +165,14 @@ export default function PlaceDetailPage() {
               src={url}
               alt=""
               loading="lazy"
+              onClick={() => setViewerIndex(i + 1)}
               style={{
                 flexShrink: 0,
                 width: '80px',
                 height: '60px',
                 objectFit: 'cover',
                 borderRadius: '8px',
+                cursor: 'zoom-in',
               }}
             />
           ))}
@@ -259,6 +268,15 @@ export default function PlaceDetailPage() {
           외부 앱으로 이동합니다
         </p>
       </div>
+
+      {/* 이미지 전체화면 미리보기 모달 */}
+      {viewerIndex !== null && (
+        <ImageViewer
+          images={displayImages}
+          initialIndex={viewerIndex}
+          onClose={() => setViewerIndex(null)}
+        />
+      )}
     </div>
   );
 }

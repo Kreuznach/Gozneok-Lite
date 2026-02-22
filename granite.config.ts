@@ -12,7 +12,7 @@ export default defineConfig({
   appName: 'gozneok-lite',
 
   brand: {
-    displayName: 'Gozneok Lite',
+    displayName: '고요한 산책',
     // NOTE: 심사 통과용 아이콘 업로드 후 Toss 콘솔에서 발급된 URL로 교체
     icon: 'https://placehold.co/96x96/3B82F6/ffffff.png',
     primaryColor: '#3B82F6',
