@@ -15,6 +15,7 @@
  */
 
 import { serverCache, SERVER_TTL } from './cache.js';
+import { config, getServiceKey } from './config.js';
 
 // ────────────────────────────────────────────────────────
 // 정규화된 장소 타입
@@ -43,23 +44,12 @@ export interface NormalizedPlace {
 }
 
 // ────────────────────────────────────────────────────────
-// 환경변수
+// 환경변수 (config 모듈에서 중앙 관리)
 // ────────────────────────────────────────────────────────
 
-const BASE_URL =
-  process.env['TOUR_API_BASE_URL'] ??
-  'https://apis.data.go.kr/B551011/KorService2';
-const MOBILE_OS = process.env['TOUR_API_MOBILE_OS'] ?? 'ETC';
-const MOBILE_APP = process.env['TOUR_API_MOBILE_APP'] ?? 'GozneokLite';
-
-/** serviceKey는 절대 로그에 출력하지 않음 */
-function getServiceKey(): string {
-  const key = process.env['TOUR_API_SERVICE_KEY'];
-  if (!key || key === '__PUT_YOUR_KEY_HERE__') {
-    throw new Error('TOUR_API_SERVICE_KEY가 설정되지 않았습니다.');
-  }
-  return key;
-}
+const BASE_URL = config.tourApiBaseUrl;
+const MOBILE_OS = config.tourApiMobileOs;
+const MOBILE_APP = config.tourApiMobileApp;
 
 // ────────────────────────────────────────────────────────
 // 공통 파라미터 빌더

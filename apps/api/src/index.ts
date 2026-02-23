@@ -15,18 +15,16 @@ import {
   fetchPlaceImagesFromTourApi,
 } from './tourProxy.js';
 import { serverCache } from './cache.js';
+import { config } from './config.js';
 
 const app = express();
-const PORT = parseInt(process.env['PORT'] ?? '3001', 10);
+const PORT = config.port;
 
 // ────────────────────────────────────────────────────────
 // 미들웨어
 // ────────────────────────────────────────────────────────
 
-const allowedOrigins = (process.env['CORS_ORIGINS'] ?? 'http://localhost:5173')
-  .split(' ')
-  .map((o) => o.trim())
-  .filter(Boolean);
+const allowedOrigins = config.corsOrigins;
 
 app.use(
   cors({
