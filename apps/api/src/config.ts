@@ -54,8 +54,11 @@ function list(key: string, fallback: string[]): string[] {
 // ── 설정 조립 ─────────────────────────────────────────────────────────────
 
 // 환경변수 우선, 없으면 내장값(builtins) 사용
+// 플레이스홀더(__FOO__ 패턴)는 미설정으로 간주
+const rawServiceKey = process.env['TOUR_API_SERVICE_KEY']?.trim() ?? '';
+const isPlaceholder = /^__.*__$/.test(rawServiceKey);
 const resolvedServiceKey =
-  (process.env['TOUR_API_SERVICE_KEY']?.trim() || '') ||
+  (!rawServiceKey || isPlaceholder ? '' : rawServiceKey) ||
   BUILTIN_TOUR_API_SERVICE_KEY;
 
 export const config = {
@@ -80,8 +83,8 @@ export const config = {
   /** true 이면 TourAPI 호출 없이 더미 데이터를 반환 */
   useDummyData: bool('USE_DUMMY_DATA', false),
 
-  /** CORS 허용 오리진 목록 */
-  corsOrigins: list('CORS_ORIGINS', ['http://localhost:5173']),
+  /** CORS 허용 오리진 목록 ('*' 단일 항목이면 모든 오리진 허용) */
+  corsOrigins: list('CORS_ORIGINS', ['*']),
 } as const;
 
 /** 서비스키를 안전하게 반환 (로그 노출 금지) */

@@ -25,10 +25,13 @@ const PORT = config.port;
 // ────────────────────────────────────────────────────────
 
 const allowedOrigins = config.corsOrigins;
+// ['*'] 인 경우 cors 미들웨어에 문자열 '*' 로 전달해야 전체 오리진 허용이 동작합니다.
+const corsOrigin: string | string[] =
+  allowedOrigins.length === 1 && allowedOrigins[0] === '*' ? '*' : allowedOrigins;
 
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: corsOrigin,
     methods: ['GET', 'POST'],
   })
 );
