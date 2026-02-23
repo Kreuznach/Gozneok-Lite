@@ -6,14 +6,15 @@
  *   1. 이미 주입된 process.env (CI/CD, Docker, 플랫폼 환경변수)
  *   2. .env.local  (로컬 개발 전용, git 제외)
  *   3. .env        (팀 공통 기본값, git 포함 가능 — 시크릿 절대 금지)
- *   4. 코드 내 하드코딩된 기본값 (비민감 값만)
- *
- * ⚠️  TOUR_API_SERVICE_KEY 가 없으면 자동으로 더미 데이터 모드로 전환됩니다.
- *     실서비스용 키는 배포 플랫폼의 환경변수 설정에서 직접 주입하세요.
+ *   4. builtins.ts (프로젝트 내장값 — base64 난독화, 서버 번들 전용)
  */
 
 import { config as dotenvConfig } from 'dotenv';
 import { resolve } from 'path';
+import {
+  BUILTIN_TOUR_API_BASE_URL,
+  BUILTIN_TOUR_API_SERVICE_KEY,
+} from './builtins.js';
 
 // ── .env 파일 로드 (파일이 없어도 에러 없이 무시) ──────────────────────
 
@@ -52,28 +53,17 @@ function list(key: string, fallback: string[]): string[] {
 
 // ── 설정 조립 ─────────────────────────────────────────────────────────────
 
-const rawServiceKey = process.env['TOUR_API_SERVICE_KEY']?.trim();
-const hasServiceKey = !!rawServiceKey && rawServiceKey !== '__PUT_YOUR_KEY_HERE__';
-
-/** API 키가 없으면 더미 모드를 자동으로 활성화 */
-const autoUseDummy = !hasServiceKey;
-
-if (autoUseDummy) {
-  console.warn(
-    '[config] ⚠️  TOUR_API_SERVICE_KEY 미설정 — 더미 데이터 모드로 실행됩니다.\n' +
-    '         실제 데이터가 필요하면 .env.local 또는 환경변수에 키를 설정하세요.',
-  );
-}
+// 환경변수 우선, 없으면 내장값(builtins) 사용
+const resolvedServiceKey =
+  (process.env['TOUR_API_SERVICE_KEY']?.trim() || '') ||
+  BUILTIN_TOUR_API_SERVICE_KEY;
 
 export const config = {
   /** HTTP 서버 포트 */
   port: int('PORT', 3001),
 
-  /** TourAPI 기본 URL */
-  tourApiBaseUrl: str(
-    'TOUR_API_BASE_URL',
-    'https://apis.data.go.kr/B551011/KorService2',
-  ),
+  /** TourAPI 기본 URL — env 우선, 없으면 내장값 */
+  tourApiBaseUrl: str('TOUR_API_BASE_URL', BUILTIN_TOUR_API_BASE_URL),
 
   /** TourAPI MobileOS */
   tourApiMobileOs: str('TOUR_API_MOBILE_OS', 'ETC'),
@@ -82,14 +72,13 @@ export const config = {
   tourApiMobileApp: str('TOUR_API_MOBILE_APP', 'GozneokLite'),
 
   /**
-   * TourAPI 서비스키
-   * 없을 경우 getServiceKey() 호출 시 예외를 던집니다.
-   * (더미 모드에서는 호출 자체가 되지 않음)
+   * TourAPI 서비스키 — env 우선, 없으면 내장값(builtins)
+   * ⚠️ 절대 응답 바디에 포함하거나 로그에 출력하지 마세요
    */
-  tourApiServiceKey: rawServiceKey ?? '',
+  tourApiServiceKey: resolvedServiceKey,
 
   /** true 이면 TourAPI 호출 없이 더미 데이터를 반환 */
-  useDummyData: bool('USE_DUMMY_DATA', false) || autoUseDummy,
+  useDummyData: bool('USE_DUMMY_DATA', false),
 
   /** CORS 허용 오리진 목록 */
   corsOrigins: list('CORS_ORIGINS', ['http://localhost:5173']),
@@ -98,10 +87,7 @@ export const config = {
 /** 서비스키를 안전하게 반환 (로그 노출 금지) */
 export function getServiceKey(): string {
   if (!config.tourApiServiceKey) {
-    throw new Error(
-      'TOUR_API_SERVICE_KEY가 설정되지 않았습니다. ' +
-      '환경변수 또는 .env.local 파일을 확인하세요.',
-    );
+    throw new Error('TOUR_API_SERVICE_KEY를 확인할 수 없습니다.');
   }
   return config.tourApiServiceKey;
 }
