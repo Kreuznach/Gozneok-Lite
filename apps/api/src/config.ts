@@ -84,7 +84,11 @@ export const config = {
   useDummyData: bool('USE_DUMMY_DATA', false),
 
   /** CORS 허용 오리진 목록 ('*' 단일 항목이면 모든 오리진 허용) */
-  corsOrigins: list('CORS_ORIGINS', ['*']),
+  corsOrigins: list('CORS_ORIGINS', [
+    'http://localhost:5173',
+    'https://gozneok-lite.apps.tossmini.com',
+    'https://gozneok-lite.private-apps.tossmini.com',
+  ]),
 } as const;
 
 /** 서비스키를 안전하게 반환 (로그 노출 금지) */
