@@ -40,11 +40,16 @@ export function BackButton({ label, to }: BackButtonProps) {
 
 interface PageHeaderProps {
   title: string;
+  /**
+   * 앱 내 뒤로가기 버튼 표시 여부.
+   * Toss 미니앱(WebView) 환경에서는 네이티브 네비게이션 바가 뒤로가기를 제공하므로
+   * 기본값을 false로 유지합니다. 중복 노출 방지.
+   */
   showBack?: boolean;
   rightElement?: React.ReactNode;
 }
 
-export function PageHeader({ title, showBack = true, rightElement }: PageHeaderProps) {
+export function PageHeader({ title, showBack = false, rightElement }: PageHeaderProps) {
   const navigate = useNavigate();
   return (
     <div
