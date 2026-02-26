@@ -203,10 +203,13 @@ export interface PlaceListParams {
 export async function fetchPlaceList(
   params: PlaceListParams
 ): Promise<PaginatedResponse<Place>> {
+  const numOfRows = params.numOfRows ?? 10;
+  const pageNo    = params.pageNo    ?? 1;
+
   const query = buildParams({
-    numOfRows: String(params.numOfRows ?? 20),
-    pageNo:    String(params.pageNo    ?? 1),
-    arrange:   'A',
+    numOfRows: String(numOfRows),
+    pageNo:    String(pageNo),
+    arrange:   'A',   // API 안정 정렬 — 클라이언트 단에서 재정렬
     contentTypeId: '12',
     ...(params.area ? { areaCode: params.area } : {}),
   });
@@ -217,13 +220,15 @@ export async function fetchPlaceList(
   const cached = memoryCache.get<PaginatedResponse<Place>>(cacheKey);
   if (cached) return cached;
 
-  const json = await fetchTourApi<TourApiResponse<TourApiItem>>(url);
+  const json  = await fetchTourApi<TourApiResponse<TourApiItem>>(url);
   const items = extractItems(json.response).map(normalizePlace);
+  const totalCount = json.response?.body?.totalCount ?? 0;
+
   const result: PaginatedResponse<Place> = {
     items,
-    totalCount: json.response?.body?.totalCount ?? 0,
-    pageNo:     params.pageNo    ?? 1,
-    numOfRows:  params.numOfRows ?? 20,
+    totalCount,
+    pageNo,
+    numOfRows,
     isFallback: false,
   };
 
