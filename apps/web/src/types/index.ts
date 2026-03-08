@@ -143,3 +143,35 @@ export interface PaginatedResponse<T> {
   numOfRows: number;
   isFallback?: boolean;
 }
+
+// ────────────────────────────────────────────────────────
+// [v2 스키마 준비] 최소 사용자 정보 (localStorage → 서버 확장 예정)
+// ────────────────────────────────────────────────────────
+
+/**
+ * 최소 사용자 프로파일 — 개인 식별 없이 UX 개인화용
+ * v2 활성화 시 storage.ts 의 USER_PROFILE 키와 연동
+ */
+export interface UserProfile {
+  deviceId: string;
+  preferredAreas?: AreaCode[];       // 자주 보는 지역
+  preferredTimeSlot?: TimeSlot;      // 자주 선택하는 시간대
+  onboardedAt: number;               // 첫 진입 timestamp (ms)
+  lastActiveAt: number;              // 마지막 사용 timestamp (ms)
+}
+
+// ────────────────────────────────────────────────────────
+// [v2 스키마 준비] 장소별 평점 데이터 (클라이언트 캐시 → 서버 집계 예정)
+// ────────────────────────────────────────────────────────
+
+/**
+ * 장소 평점 집계 — 베이지안 보정 점수 기반
+ * v2 활성화 시 /api/ratings/:contentId 엔드포인트 연동 예정
+ */
+export interface PlaceRating {
+  contentId: string;
+  bayesianScore: number;   // 베이지안 보정 점수 (1.0 ~ 5.0)
+  rawAverage: number;      // 단순 평균 (레퍼런스용)
+  voteCount: number;       // 누적 투표 수
+  lastVotedAt: number;     // 마지막 투표 timestamp (ms) — 캐시 갱신 판단용
+}

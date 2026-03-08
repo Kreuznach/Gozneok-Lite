@@ -90,6 +90,16 @@
 - [ ] 심사 제출 (Toss 파트너 콘솔에서 제출 — 외적 절차)
 
 ---
+## v0.1.1 소규모 업데이트 (2026-03-07)
+
+### 변경 사항
+- [x] **위치 권한**: '내 주변 조용한 곳 보기' 클릭 시 Toss SDK `getCurrentLocation` → 네이티브 위치 권한 다이얼로그 호출 확인 (Day 11부터 구현됨)
+- [x] **지역 선택 무작위**: RegionSelect 화면에서 API 재호출 없이 클라이언트 측 셔플(`useMemo`) 적용
+- [x] **필터 기능 준비**: PlaceList에 v2 콘텐츠 유형 필터 주석 placeholder 추가 (contentTypeId 기준, 다음 업데이트에서 활성화)
+- [x] **v2 스키마 준비**: `UserProfile`, `PlaceRating` 타입 정의 추가 (`types/index.ts`)
+- [x] **v2 storage 키 준비**: `gz_user_profile`, `gz_place_ratings` 주석 키 추가 (`storage.ts`)
+- [x] **DATA_MODEL.md 갱신**: v2 SQL 스키마 및 localStorage 키 테이블 업데이트
+
 
 ## 완료 기준
 

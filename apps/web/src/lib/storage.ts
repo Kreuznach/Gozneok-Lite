@@ -8,6 +8,10 @@ const KEYS = {
   DEVICE_ID: 'gz_device_id',
   WISHLIST: 'gz_wishlist',
   // VOTES: 'gz_votes', — 투표 기능 v2 예정, 현재 미사용
+  // [v2 준비] 최소 사용자 정보 (onboardedAt, preferredAreas, preferredTimeSlot 등)
+  // USER_PROFILE: 'gz_user_profile',
+  // [v2 준비] 장소 평점 로컬 캐시 (bayesianScore / voteCount 등 서버 집계 결과 임시 저장)
+  // PLACE_RATINGS: 'gz_place_ratings',
 } as const;
 
 // ────────────────────────────────────────────────────────
