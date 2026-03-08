@@ -22,6 +22,22 @@ import { TIME_SLOTS } from '@/types/constants';
 /** 초기 호출 시 수신하는 장소 수 — 셔플 풀 크기 */
 const NUM_OF_ROWS = 50;
 
+type SortMode = 'popular' | 'nameAsc' | 'nameDesc' | 'distance';
+
+/**
+ * Haversine 공식 — 두 위경도 간 거리(미터)
+ */
+function haversineM(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6_371_000; // 지구 반경 (m)
+  const rad = (d: number) => (d * Math.PI) / 180;
+  const dLat = rad(lat2 - lat1);
+  const dLng = rad(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(rad(lat1)) * Math.cos(rad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
 /**
  * Fisher-Yates 셔플 — 원본 배열 불변, 새 배열 반환
  */
@@ -90,7 +106,7 @@ export default function PlaceListPage() {
         );
         // 초기 로드(reset) 시 셔플, 페이지 추가 시 순서 유지
         const nextItems = reset ? shuffleArray(res.items) : res.items;
-        setPlaces((prev) => (reset ? nextItems : [...prev, ...nextItems]));
+        setAllPlaces((prev) => (reset ? nextItems : [...prev, ...nextItems]));
         setIsFallback(res.isFallback ?? false);
         // totalCount 기반 hasMore — 더 이상 페이지 없으면 버튼 숨김
         setHasMore(page * NUM_OF_ROWS < res.totalCount);
@@ -261,11 +277,11 @@ export default function PlaceListPage() {
           >
             <span style={{ fontWeight: 700 }}>⏱ {lastFetchMs}ms</span>
             <span>|</span>
-            <span>{places.length}건 · 셔플됨</span>
+            <span>{allPlaces.length}건 · 셔플됨</span>
           </div>
         )}
 
-        {loading && places.length === 0 ? (
+        {loading && allPlaces.length === 0 ? (
           <>
             <PlaceCardSkeleton />
             <PlaceCardSkeleton />

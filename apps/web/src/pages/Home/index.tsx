@@ -7,7 +7,6 @@ import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/app/routes';
 import { useRecommendation } from '@/lib/recommendationContext';
 import { TimeSlotChips } from '@/components/TimeSlotChips';
-import { AREAS } from '@/types/constants';
 import type { TimeSlot } from '@/types';
 import { APP_DISPLAY_NAME } from '@/types/constants';
 
