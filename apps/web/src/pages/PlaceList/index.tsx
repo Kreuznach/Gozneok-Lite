@@ -1,7 +1,10 @@
 /**
  * PlaceList/index.tsx — 장소 목록 화면
+ * - 정렬: 인기순(랜덤·기본) / 이름 ▲ / 이름 ▼ / 거리순
+ * - 검색: 장소명·주소 키워드 필터 (클라이언트 사이드)
+ * - 통신량 절감: numOfRows 10 / 정렬·검색 시 재호출 없음
  */
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/app/routes';
 import { useRecommendation } from '@/lib/recommendationContext';
@@ -37,25 +40,35 @@ export default function PlaceListPage() {
     useRecommendation();
   const { add, remove, has } = useWishlist();
 
-  const [places, setPlaces] = useState<Place[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  // ── 원본 풀 (API 수신 순서 그대로 보존) ────────────────
+  const [allPlaces, setAllPlaces]   = useState<Place[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [loading, setLoading]       = useState(true);
+  const [error, setError]           = useState(false);
   const [isFallback, setIsFallback] = useState(false);
   const [pageNo, setPageNo] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   /** 마지막 API 응답 시간 (ms). null = 미측정 */
   const [lastFetchMs, setLastFetchMs] = useState<number | null>(null);
 
-  // 광고: 최초 로드 완료 후 처음 새로고침 시 전면형 가능
+  // ── UI 상태 ────────────────────────────────────────────
+  const [sortMode, setSortMode]       = useState<SortMode>('popular');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // 인기순용 안정 난수 맵 — 로드마다 초기화
+  const shuffleMap = useRef<Map<string, number>>(new Map());
+
+  // 광고: 최초 로드 완료 후 새로고침 시만 전면형
   const isFirstLoad = useRef(true);
 
-  // 목록 진입 시 조건 체크
+  // ── 진입 조건 체크 ──────────────────────────────────────
   useEffect(() => {
     if (!selectedTimeSlot && !useLocation && !selectedArea) {
       navigate(ROUTES.HOME, { replace: true });
     }
   }, [selectedArea, selectedTimeSlot, useLocation, navigate]);
 
+  // ── 데이터 로드 ─────────────────────────────────────────
   const loadPlaces = useCallback(
     async (page: number, reset = false) => {
       setLoading(true);
@@ -63,11 +76,11 @@ export default function PlaceListPage() {
       const t0 = performance.now();
       try {
         const res = await fetchPlaceList({
-          area: useLocation ? undefined : selectedArea?.code,
-          timeSlot: selectedTimeSlot ?? 'now',
-          lat: useLocation ? userLat : undefined,
-          lng: useLocation ? userLng : undefined,
-          pageNo: page,
+          area:      useLocation ? undefined : selectedArea?.code,
+          timeSlot:  selectedTimeSlot ?? 'now',
+          lat:       useLocation ? userLat : undefined,
+          lng:       useLocation ? userLng : undefined,
+          pageNo:    page,
           numOfRows: NUM_OF_ROWS,
         });
         const elapsed = Math.round(performance.now() - t0);
@@ -79,7 +92,8 @@ export default function PlaceListPage() {
         const nextItems = reset ? shuffleArray(res.items) : res.items;
         setPlaces((prev) => (reset ? nextItems : [...prev, ...nextItems]));
         setIsFallback(res.isFallback ?? false);
-        setHasMore(res.items.length === NUM_OF_ROWS);
+        // totalCount 기반 hasMore — 더 이상 페이지 없으면 버튼 숨김
+        setHasMore(page * NUM_OF_ROWS < res.totalCount);
       } catch {
         setLastFetchMs(Math.round(performance.now() - t0));
         setError(true);
@@ -94,15 +108,50 @@ export default function PlaceListPage() {
 
   useEffect(() => {
     setPageNo(1);
-    setPlaces([]);
+    setAllPlaces([]);
     loadPlaces(1, true);
   }, [loadPlaces]);
 
-  const handleRefresh = useCallback(async () => {
-    // 새로고침 시 전면 광고 가능 (첫 진입 제외)
-    if (!isFirstLoad.current) {
-      void showInterstitialAd();
+  // ── 표시 목록: 검색 → 정렬 (재호출 없음) ──────────────
+  const displayPlaces = useMemo<Place[]>(() => {
+    // 1. 키워드 필터
+    const q = searchQuery.trim().toLowerCase();
+    const filtered = q
+      ? allPlaces.filter(
+          (p) =>
+            p.title.toLowerCase().includes(q) ||
+            p.addr1.toLowerCase().includes(q)
+        )
+      : allPlaces;
+
+    // 2. 정렬
+    const sorted = [...filtered];
+    if (sortMode === 'nameAsc') {
+      sorted.sort((a, b) => a.title.localeCompare(b.title, 'ko'));
+    } else if (sortMode === 'nameDesc') {
+      sorted.sort((a, b) => b.title.localeCompare(a.title, 'ko'));
+    } else if (sortMode === 'distance' && userLat != null && userLng != null) {
+      sorted.sort(
+        (a, b) =>
+          haversineM(userLat, userLng, a.mapy, a.mapx) -
+          haversineM(userLat, userLng, b.mapy, b.mapx)
+      );
+    } else if (sortMode === 'popular') {
+      // 세션 내 안정 랜덤 (새로고침마다 초기화)
+      sorted.sort((a, b) => {
+        if (!shuffleMap.current.has(a.contentId))
+          shuffleMap.current.set(a.contentId, Math.random());
+        if (!shuffleMap.current.has(b.contentId))
+          shuffleMap.current.set(b.contentId, Math.random());
+        return shuffleMap.current.get(a.contentId)! - shuffleMap.current.get(b.contentId)!;
+      });
     }
+    return sorted;
+  }, [allPlaces, sortMode, searchQuery, userLat, userLng]);
+
+  // ── 핸들러 ─────────────────────────────────────────────
+  const handleRefresh = useCallback(async () => {
+    if (!isFirstLoad.current) void showInterstitialAd();
     setPageNo(1);
     await loadPlaces(1, true);
   }, [loadPlaces]);
@@ -114,18 +163,16 @@ export default function PlaceListPage() {
   }, [pageNo, loadPlaces]);
 
   const handleTimeSlotChange = useCallback(
-    (slot: TimeSlot) => {
-      setTimeSlot(slot);
-    },
+    (slot: TimeSlot) => { setTimeSlot(slot); },
     [setTimeSlot]
   );
 
-  const locationLabel = useLocation
-    ? '내 주변'
-    : selectedArea?.name ?? '';
-  const timeLabel =
-    TIME_SLOTS.find((t) => t.key === selectedTimeSlot)?.label ?? '';
+  // ── 레이블 ─────────────────────────────────────────────
+  const locationLabel = useLocation ? '내 주변' : selectedArea?.name ?? '';
+  const timeLabel = TIME_SLOTS.find((t) => t.key === selectedTimeSlot)?.label ?? '';
+  const hasGeo = useLocation && userLat != null && userLng != null;
 
+  // ── 렌더 ───────────────────────────────────────────────
   return (
     <div>
       <PageHeader
@@ -147,11 +194,9 @@ export default function PlaceListPage() {
         }
       />
 
-      <div style={{ padding: '12px 20px' }}>
-        <TimeSlotChips
-          selected={selectedTimeSlot}
-          onSelect={handleTimeSlotChange}
-        />
+      {/* 시간대 칩 */}
+      <div style={{ padding: '12px 20px 0' }}>
+        <TimeSlotChips selected={selectedTimeSlot} onSelect={handleTimeSlotChange} />
       </div>
 
       {/*
@@ -226,13 +271,19 @@ export default function PlaceListPage() {
             <PlaceCardSkeleton />
             <PlaceCardSkeleton />
           </>
-        ) : error && places.length === 0 ? (
+        ) : error && allPlaces.length === 0 ? (
           <EmptyState
             title="장소를 불러오지 못했어요"
             description="네트워크 연결을 확인하거나 잠시 후 다시 시도해주세요"
             action={{ label: '다시 시도', onClick: handleRefresh }}
           />
-        ) : places.length === 0 ? (
+        ) : displayPlaces.length === 0 && searchQuery ? (
+          <EmptyState
+            title="검색 결과가 없어요"
+            description="다른 키워드로 검색하거나 더 많은 장소를 불러와보세요"
+            action={hasMore ? { label: '장소 더 불러오기', onClick: handleLoadMore } : undefined}
+          />
+        ) : allPlaces.length === 0 ? (
           <EmptyState
             title="해당 조건의 장소가 없어요"
             description="다른 지역이나 시간대를 선택해보세요"
@@ -240,29 +291,36 @@ export default function PlaceListPage() {
           />
         ) : (
           <>
-            {places.map((place) => (
-              <PlaceCard
-                key={place.contentId}
-                place={place}
-                isWishlisted={has(place.contentId)}
-                onWishlistToggle={() => {
-                  if (has(place.contentId)) {
-                    remove(place.contentId);
-                  } else {
-                    add({
-                      contentId: place.contentId,
-                      title: place.title,
-                      addr1: place.addr1,
-                      firstimage: place.firstimage,
-                      savedAt: Date.now(),
-                    });
-                  }
-                }}
-              />
-            ))}
+            {displayPlaces.map((place) => {
+              const distM =
+                hasGeo
+                  ? haversineM(userLat!, userLng!, place.mapy, place.mapx)
+                  : undefined;
+              return (
+                <PlaceCard
+                  key={place.contentId}
+                  place={place}
+                  distanceMeters={distM}
+                  isWishlisted={has(place.contentId)}
+                  onWishlistToggle={() => {
+                    if (has(place.contentId)) {
+                      remove(place.contentId);
+                    } else {
+                      add({
+                        contentId:  place.contentId,
+                        title:      place.title,
+                        addr1:      place.addr1,
+                        firstimage: place.firstimage,
+                        savedAt:    Date.now(),
+                      });
+                    }
+                  }}
+                />
+              );
+            })}
 
-            {/* 더 보기 */}
-            {hasMore && (
+            {/* 추가 로드 */}
+            {hasMore && !searchQuery && (
               <button
                 onClick={handleLoadMore}
                 disabled={loading}

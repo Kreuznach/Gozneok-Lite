@@ -1,5 +1,5 @@
 import React, { lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProviders } from './providers';
 import { AppLayout } from './Layout';
 import { PageLoader } from '@/components/Skeletons';
@@ -20,7 +20,7 @@ const DebugPage = lazy(() => import('@/pages/Debug'));
 export function App() {
   return (
     <AppProviders>
-      <BrowserRouter>
+      <HashRouter>
         <AppLayout>
           <Suspense fallback={<PageLoader />}>
             <Routes>
@@ -31,15 +31,13 @@ export function App() {
               <Route path={ROUTES.PLACE_DETAIL} element={<PlaceDetailPage />} />
               <Route path={ROUTES.WISHLIST} element={<WishlistPage />} />
               <Route path={ROUTES.SETTINGS} element={<SettingsPage />} />
-              {/* Debug: 개발 환경에서만 표시 */}
-              {import.meta.env.DEV && (
-                <Route path={ROUTES.DEBUG} element={<DebugPage />} />
-              )}
+              {/* Debug: 항상 라우트 등록 — 설정 탭에서 활성화해야 진입 링크 표시 */}
+              <Route path={ROUTES.DEBUG} element={<DebugPage />} />
               <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
             </Routes>
           </Suspense>
         </AppLayout>
-      </BrowserRouter>
+      </HashRouter>
     </AppProviders>
   );
 }
