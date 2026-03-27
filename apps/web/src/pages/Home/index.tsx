@@ -6,6 +6,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/app/routes';
 import { useRecommendation } from '@/lib/recommendationContext';
+import { attachMainBannerAd } from '@/lib/admob';
 import { TimeSlotChips } from '@/components/TimeSlotChips';
 import type { TimeSlot } from '@/types';
 import { APP_DISPLAY_NAME } from '@/types/constants';
@@ -15,6 +16,29 @@ import {
   GetCurrentLocationPermissionError,
   Accuracy,
 } from '@apps-in-toss/web-framework';
+
+const LOCATION_PERMISSION_PROMPT_SESSION_KEY = 'gz_location_prompted_on_launch';
+
+/**
+ * 앱 진입 시 위치 권한 다이얼로그를 1회 사전 노출합니다.
+ * - 세션당 1회만 실행
+ * - 이미 허용된 경우 추가 동작 없음
+ */
+async function preflightLocationPermissionOnLaunch(): Promise<void> {
+  try {
+    if (sessionStorage.getItem(LOCATION_PERMISSION_PROMPT_SESSION_KEY) === '1') {
+      return;
+    }
+    sessionStorage.setItem(LOCATION_PERMISSION_PROMPT_SESSION_KEY, '1');
+
+    const status = await getCurrentLocation.getPermission();
+    if (status === 'allowed') return;
+
+    await getCurrentLocation.openPermissionDialog();
+  } catch {
+    // 권한 사전 요청 실패는 UX를 막지 않음
+  }
+}
 
 /**
  * Toss SDK getCurrentLocation 호출 후 좌표 반환
@@ -53,9 +77,10 @@ async function requestLocationPermission(): Promise<{
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const { selectedTimeSlot, setTimeSlot, setLocation, clearLocation, setArea } =
+  const { selectedTimeSlot, setTimeSlot, setLocation, clearLocation } =
     useRecommendation();
   const [locationLoading, setLocationLoading] = useState(false);
+  const [bannerHost, setBannerHost] = useState<HTMLDivElement | null>(null);
 
   // 진입 시 기본 시간대 = 'now'
   useEffect(() => {
@@ -63,6 +88,20 @@ export default function HomePage() {
       setTimeSlot('now');
     }
   }, [selectedTimeSlot, setTimeSlot]);
+
+  // 앱 진입 시 위치 권한 다이얼로그 사전 노출 (세션 1회)
+  useEffect(() => {
+    void preflightLocationPermissionOnLaunch();
+  }, []);
+
+  // 홈 배너 광고 부착
+  useEffect(() => {
+    if (!bannerHost) return;
+    const destroy = attachMainBannerAd(bannerHost);
+    return () => {
+      destroy?.();
+    };
+  }, [bannerHost]);
 
   const handleTimeSlotSelect = useCallback(
     (slot: TimeSlot) => {
@@ -207,12 +246,27 @@ export default function HomePage() {
           </p>
         </section>
 
+        {/* 메인 노출형 광고 */}
+        <section style={{ marginTop: '20px' }}>
+          <div
+            ref={setBannerHost}
+            style={{
+              width: '100%',
+              minHeight: '64px',
+              borderRadius: '12px',
+              background: '#f8fafc',
+              border: '1px solid #eef1f4',
+              overflow: 'hidden',
+            }}
+          />
+        </section>
+
         {/* 바로가기 */}
         <div
           style={{
             display: 'flex',
             gap: '10px',
-            marginTop: '28px',
+            marginTop: '24px',
           }}
         >
           <button

@@ -12,6 +12,7 @@
  */
 import {
   GoogleAdMob,
+  TossAds,
   loadFullScreenAd,
   showFullScreenAd,
 } from '@apps-in-toss/web-framework';
@@ -21,6 +22,8 @@ const AD_GROUP_INTERSTITIAL =
   import.meta.env.VITE_ADMOB_INTERSTITIAL_GROUP_ID ?? '';
 const AD_GROUP_REWARDED =
   import.meta.env.VITE_ADMOB_REWARDED_GROUP_ID ?? '';
+const AD_GROUP_BANNER =
+  import.meta.env.VITE_ADMOB_BANNER_GROUP_ID ?? 'ait.v2.live.cc42e4d2cbf54b8d';
 
 /** 전면형 쿨다운 (2분) */
 const INTERSTITIAL_COOLDOWN_MS = 2 * 60 * 1000;
@@ -146,6 +149,42 @@ export function isAdSupportedSync(): boolean {
 /** async 래퍼 (기존 호환) */
 export async function isAdSupported(): Promise<boolean> {
   return isAdSupportedSync();
+}
+
+/** 메인 배너 광고 지원 여부 */
+export function isBannerAdSupportedSync(): boolean {
+  if (!AD_GROUP_BANNER) return false;
+  try {
+    return TossAds.attachBanner.isSupported();
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * 메인 화면 배너 광고 부착
+ * @returns destroy 함수 (광고 정리), 미지원 시 null
+ */
+export function attachMainBannerAd(target: HTMLElement): (() => void) | null {
+  try {
+    if (!isBannerAdSupportedSync()) return null;
+
+    const slot = TossAds.attachBanner(AD_GROUP_BANNER, target, {
+      theme: 'auto',
+      variant: 'card',
+      tone: 'grey',
+    });
+
+    return () => {
+      try {
+        slot.destroy();
+      } catch {
+        // 광고 정리 실패는 무시
+      }
+    };
+  } catch {
+    return null;
+  }
 }
 
 /**

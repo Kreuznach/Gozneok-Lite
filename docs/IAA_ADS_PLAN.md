@@ -2,7 +2,7 @@
 
 ## 광고 플랫폼
 - **Apps in Toss AdMob API**
-- TODO: 실제 인터페이스 확인 필요 (@apps-in-toss/web-framework 문서)
+- **SDK 기준 버전**: `@apps-in-toss/web-framework` `2.x`
 
 ---
 
@@ -12,6 +12,17 @@
 ---
 
 ## 광고 타입별 계획
+
+### 노출형 (Banner)
+
+| 항목 | 내용 |
+|------|------|
+| 노출 지점 | 홈 메인 화면 (시간/지역 선택 UI 하단) |
+| 광고 ID | `ait.v2.live.cc42e4d2cbf54b8d` |
+| SDK API | `TossAds.attachBanner(adGroupId, target, options)` |
+| 실패 시 | 배너 영역만 비활성, 나머지 UX 영향 없음 |
+
+---
 
 ### 전면형 (Interstitial)
 
@@ -48,6 +59,7 @@
 
 | 환경변수 | 설명 |
 |----------|------|
+| `VITE_ADMOB_BANNER_GROUP_ID` | 노출형(배너) 광고 그룹 ID |
 | `VITE_ADMOB_INTERSTITIAL_GROUP_ID` | 전면형 광고 그룹 ID |
 | `VITE_ADMOB_REWARDED_GROUP_ID` | 보상형 광고 그룹 ID |
 
@@ -71,7 +83,6 @@
 
 ## 광고 SDK 불확실 사항 (TODO)
 
-- `@apps-in-toss/web-framework` 실제 AdMob API 메서드 시그니처 확인 필요
-- `adGroupId` 발급 절차 (Toss 파트너 콘솔)
+- `adGroupId` 발급/교체 절차 (Toss 파트너 콘솔)
 - 샌드박스 테스트 광고 ID 존재 여부
-- 현재 `admob.ts`는 예상 인터페이스 기준으로 구현 — SDK 확인 즉시 교체
+- 운영 배너 ID 교체 시, `VITE_ADMOB_BANNER_GROUP_ID` 우선 적용

@@ -41,9 +41,16 @@
 ---
 
 ## 수익화
-- **IAA 중심**: 전면형(Interstitial) + 보상형(Rewarded)
+- **IAA 중심**: 노출형(Banner) + 전면형(Interstitial) + 보상형(Rewarded)
 - Apps in Toss AdMob API 사용
 - 광고 미지원/실패 시 UX에 영향 없음
+
+---
+
+## 권한 정책
+- 앱 첫 진입 시 위치 권한 다이얼로그 사전 요청 (세션당 1회)
+- 권한 거부 시 지역 선택 플로우로 즉시 대체
+- Toss SDK 미지원 환경에서는 브라우저 Geolocation 폴백
 
 ---
 
@@ -57,7 +64,7 @@
 ## 기술 스택
 | 영역 | 기술 |
 |------|------|
-| 프론트 | Vite + React 18 + TypeScript |
+| 프론트 | Vite + React 18 + TypeScript + `@apps-in-toss/web-framework` 2.x |
 | 라우팅 | react-router-dom v6 |
 | 상태 | React Context + Hooks (Redux 없음) |
 | 스타일 | TDS(Toss Design System) + 인라인 스타일 최소화 |
