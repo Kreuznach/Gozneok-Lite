@@ -3,12 +3,20 @@
  * Apps in Toss AdMob API 래퍼
  *
  * SDK: @apps-in-toss/web-framework (web-bridge 경유)
+ * - 배너(노출형):       TossAds.attachBanner  — 토스앱 5.241.0 이상 필요
  * - 전면형(인터스티셜): loadFullScreenAd → showFullScreenAd
  * - 보상형(리워드):     GoogleAdMob.loadAppsInTossAdMob → GoogleAdMob.showAppsInTossAdMob
+ *
+ * 배너 광고 ID
+ *   TEST (비PROD 빌드): ait-ad-test-native-image-id  (피드형·native-image)
+ *   LIVE (PROD 빌드):   ait.v2.live.cc42e4d2cbf54b8d
+ *   환경변수 VITE_ADMOB_BANNER_GROUP_ID 가 설정된 경우 해당 값을 최우선 사용
  *
  * 빈도 룰:
  *   전면형: 2분 쿨다운, 세션 최대 2회
  *   보상형: 명시적 버튼 클릭 시에만
+ *
+ * 참고: https://developers-apps-in-toss.toss.im/bedrock/reference/framework/광고/RN-BannerAd.html
  */
 import {
   GoogleAdMob,
@@ -22,8 +30,15 @@ const AD_GROUP_INTERSTITIAL =
   import.meta.env.VITE_ADMOB_INTERSTITIAL_GROUP_ID ?? '';
 const AD_GROUP_REWARDED =
   import.meta.env.VITE_ADMOB_REWARDED_GROUP_ID ?? '';
+/**
+ * 배너 광고 그룹 ID
+ * 우선순위: 환경변수 > PROD 빌드('ait.v2.live.cc42e4d2cbf54b8d') > TEST('ait-ad-test-native-image-id')
+ */
 const AD_GROUP_BANNER =
-  import.meta.env.VITE_ADMOB_BANNER_GROUP_ID ?? 'ait.v2.live.cc42e4d2cbf54b8d';
+  import.meta.env.VITE_ADMOB_BANNER_GROUP_ID ||
+  (import.meta.env.PROD
+    ? 'ait.v2.live.cc42e4d2cbf54b8d'
+    : 'ait-ad-test-native-image-id');
 
 /** 전면형 쿨다운 (2분) */
 const INTERSTITIAL_COOLDOWN_MS = 2 * 60 * 1000;
@@ -171,8 +186,8 @@ export function attachMainBannerAd(target: HTMLElement): (() => void) | null {
 
     const slot = TossAds.attachBanner(AD_GROUP_BANNER, target, {
       theme: 'auto',
-      variant: 'card',
-      tone: 'grey',
+      variant: 'expanded',   // 피드형(native image) 광고에 적합한 인라인 확장 레이아웃
+      tone: 'blackAndWhite', // 문서 기본값(SDK 기준)에 맞춤
     });
 
     return () => {

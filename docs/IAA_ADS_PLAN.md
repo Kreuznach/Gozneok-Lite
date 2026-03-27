@@ -3,6 +3,7 @@
 ## 광고 플랫폼
 - **Apps in Toss AdMob API**
 - **SDK 기준 버전**: `@apps-in-toss/web-framework` `2.x`
+- **배너 API 참고**: [RN-BannerAd 문서](https://developers-apps-in-toss.toss.im/bedrock/reference/framework/%EA%B4%91%EA%B3%A0/RN-BannerAd.html)
 
 ---
 
@@ -17,9 +18,15 @@
 
 | 항목 | 내용 |
 |------|------|
-| 노출 지점 | 홈 메인 화면 (시간/지역 선택 UI 하단) |
-| 광고 ID | `ait.v2.live.cc42e4d2cbf54b8d` |
+| 노출 지점 | 홈 메인 화면 (장소 찾기 버튼 하단) |
+| 광고 종류 | 피드형 (native image) |
+| TEST 광고 ID | `ait-ad-test-native-image-id` |
+| LIVE 광고 ID | `ait.v2.live.cc42e4d2cbf54b8d` |
+| ID 선택 로직 | `VITE_ADMOB_BANNER_GROUP_ID` 환경변수 우선 → PROD 빌드: LIVE ID → 비PROD: TEST ID |
 | SDK API | `TossAds.attachBanner(adGroupId, target, options)` |
+| 옵션 | `theme: 'auto'`, `variant: 'expanded'`, `tone: 'blackAndWhite'` |
+| 최소 토스 앱 버전 | 5.241.0 이상 |
+| 컨테이너 높이 | `minHeight: 96px` (문서 권장 고정 높이) |
 | 실패 시 | 배너 영역만 비활성, 나머지 UX 영향 없음 |
 
 ---
@@ -59,11 +66,12 @@
 
 | 환경변수 | 설명 |
 |----------|------|
-| `VITE_ADMOB_BANNER_GROUP_ID` | 노출형(배너) 광고 그룹 ID |
+| `VITE_ADMOB_BANNER_GROUP_ID` | 배너 광고 그룹 ID (미설정 시 환경 자동 분기) |
 | `VITE_ADMOB_INTERSTITIAL_GROUP_ID` | 전면형 광고 그룹 ID |
 | `VITE_ADMOB_REWARDED_GROUP_ID` | 보상형 광고 그룹 ID |
 
-- 미설정 시 광고 기능 자동 비활성화
+- 배너: 환경변수 미설정 시 PROD 빌드(`import.meta.env.PROD`)이면 LIVE ID, 아니면 TEST ID 자동 사용
+- 전면형/보상형: 미설정 시 광고 기능 자동 비활성화
 - 앱 나머지 기능에 영향 없음
 
 ---
@@ -72,17 +80,10 @@
 
 | 상황 | 동작 |
 |------|------|
-| `isSupported()` = false | 광고 없이 진행 |
+| `isSupported()` = false (토스앱 5.241 미만 포함) | 광고 없이 진행 |
 | 로드 타임아웃 (5초) | 광고 없이 진행 |
-| 노출 실패 | 광고 없이 진행 |
+| 노출 실패 / `onAdFailedToRender` | 광고 없이 진행 |
+| `onNoFill` | 배너 영역 공백 유지 |
 | 보상형 실패 | 잠금 해제 처리 (사용자 불이익 없음) |
 
 > **원칙**: 광고 실패가 사용자 경험에 영향을 미쳐서는 안 됩니다.
-
----
-
-## 광고 SDK 불확실 사항 (TODO)
-
-- `adGroupId` 발급/교체 절차 (Toss 파트너 콘솔)
-- 샌드박스 테스트 광고 ID 존재 여부
-- 운영 배너 ID 교체 시, `VITE_ADMOB_BANNER_GROUP_ID` 우선 적용

@@ -246,13 +246,13 @@ export default function HomePage() {
           </p>
         </section>
 
-        {/* 메인 노출형 광고 */}
+        {/* 메인 노출형 광고 — 피드형(native image), 문서 기준 고정 높이 96px */}
         <section style={{ marginTop: '20px' }}>
           <div
             ref={setBannerHost}
             style={{
               width: '100%',
-              minHeight: '64px',
+              minHeight: '96px',
               borderRadius: '12px',
               background: '#f8fafc',
               border: '1px solid #eef1f4',
