@@ -20,7 +20,7 @@
 |------|------|
 | 노출 지점 | 홈 메인 화면 (장소 찾기 버튼 하단) |
 | 광고 종류 | 피드형 (native image) |
-| TEST 광고 ID | `ait-ad-test-native-image-id` |
+| TEST 광고 ID | `ait-ad-test-banner-id` |
 | LIVE 광고 ID | `ait.v2.live.cc42e4d2cbf54b8d` |
 | ID 선택 로직 | `VITE_ADMOB_BANNER_GROUP_ID` 환경변수 우선 → PROD 빌드: LIVE ID → 비PROD: TEST ID |
 | SDK API | `TossAds.attachBanner(adGroupId, target, options)` |

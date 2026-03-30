@@ -8,7 +8,7 @@
  * - 보상형(리워드):     GoogleAdMob.loadAppsInTossAdMob → GoogleAdMob.showAppsInTossAdMob
  *
  * 배너 광고 ID
- *   TEST (비PROD 빌드): ait-ad-test-native-image-id  (피드형·native-image)
+ *   TEST (비PROD 빌드): ait-ad-test-banner-id
  *   LIVE (PROD 빌드):   ait.v2.live.cc42e4d2cbf54b8d
  *   환경변수 VITE_ADMOB_BANNER_GROUP_ID 가 설정된 경우 해당 값을 최우선 사용
  *
@@ -32,13 +32,13 @@ const AD_GROUP_REWARDED =
   import.meta.env.VITE_ADMOB_REWARDED_GROUP_ID ?? '';
 /**
  * 배너 광고 그룹 ID
- * 우선순위: 환경변수 > PROD 빌드('ait.v2.live.cc42e4d2cbf54b8d') > TEST('ait-ad-test-native-image-id')
+ * 우선순위: 환경변수 > PROD 빌드('ait.v2.live.cc42e4d2cbf54b8d') > TEST('ait-ad-test-banner-id')
  */
 const AD_GROUP_BANNER =
   import.meta.env.VITE_ADMOB_BANNER_GROUP_ID ||
   (import.meta.env.PROD
     ? 'ait.v2.live.cc42e4d2cbf54b8d'
-    : 'ait-ad-test-native-image-id');
+    : 'ait-ad-test-banner-id');
 
 /** 전면형 쿨다운 (2분) */
 const INTERSTITIAL_COOLDOWN_MS = 2 * 60 * 1000;
