@@ -2,15 +2,19 @@
  * admob.ts
  * Apps in Toss AdMob API 래퍼
  *
- * SDK: @apps-in-toss/web-framework (web-bridge 경유)
- * - 배너(노출형):       TossAds.attachBanner  — 토스앱 5.241.0 이상 필요
+ * SDK: @apps-in-toss/web-framework v2.1.1 (web-bridge 경유)
+ * - 배너(노출형):       TossAds.initialize() → TossAds.attachBanner()  — 토스앱 5.241.0 이상 필요
  * - 전면형(인터스티셜): loadFullScreenAd → showFullScreenAd
  * - 보상형(리워드):     GoogleAdMob.loadAppsInTossAdMob → GoogleAdMob.showAppsInTossAdMob
  *
- * 배너 광고 ID
- *   TEST (비PROD 빌드): ait-ad-test-native-image-id  (피드형·native-image)
- *   LIVE (PROD 빌드):   ait.v2.live.cc42e4d2cbf54b8d
+ * 배너 광고 ID: ait.v2.live.cc42e4d2cbf54b8d
  *   환경변수 VITE_ADMOB_BANNER_GROUP_ID 가 설정된 경우 해당 값을 최우선 사용
+ *
+ * 배너 초기화 흐름:
+ *   1. TossAds.initialize() — toss-ads-space-kit JS SDK를 동적 로드 (CDN: static.toss.im)
+ *   2. onInitialized 콜백 → TossAds.attachBanner() 호출
+ *   ※ initialize() 없이 attachBanner()를 직접 호출하면
+ *     "[toss-ad] Call initialize() before attaching an ad." 오류 발생
  *
  * 빈도 룰:
  *   전면형: 2분 쿨다운, 세션 최대 2회
@@ -21,6 +25,7 @@
 import {
   GoogleAdMob,
   TossAds,
+  type TossAdsAttachBannerResult,
   loadFullScreenAd,
   showFullScreenAd,
 } from '@apps-in-toss/web-framework';
@@ -32,13 +37,10 @@ const AD_GROUP_REWARDED =
   import.meta.env.VITE_ADMOB_REWARDED_GROUP_ID ?? '';
 /**
  * 배너 광고 그룹 ID
- * 우선순위: 환경변수 > PROD 빌드('ait.v2.live.cc42e4d2cbf54b8d') > TEST('ait-ad-test-native-image-id')
+ * 우선순위: 환경변수 > 'ait.v2.live.cc42e4d2cbf54b8d' (모든 환경에서 활성화)
  */
 const AD_GROUP_BANNER =
-  import.meta.env.VITE_ADMOB_BANNER_GROUP_ID ||
-  (import.meta.env.PROD
-    ? 'ait.v2.live.cc42e4d2cbf54b8d'
-    : 'ait-ad-test-native-image-id');
+  import.meta.env.VITE_ADMOB_BANNER_GROUP_ID ?? 'ait.v2.live.cc42e4d2cbf54b8d';
 
 /** 전면형 쿨다운 (2분) */
 const INTERSTITIAL_COOLDOWN_MS = 2 * 60 * 1000;
@@ -170,7 +172,7 @@ export async function isAdSupported(): Promise<boolean> {
 export function isBannerAdSupportedSync(): boolean {
   if (!AD_GROUP_BANNER) return false;
   try {
-    return TossAds.attachBanner.isSupported();
+    return TossAds.initialize.isSupported() && TossAds.attachBanner.isSupported();
   } catch {
     return false;
   }
@@ -178,28 +180,50 @@ export function isBannerAdSupportedSync(): boolean {
 
 /**
  * 메인 화면 배너 광고 부착
+ *
+ * SDK 초기화 흐름:
+ *   TossAds.initialize() 가 toss-ads-space-kit JS를 동적으로 로드하고,
+ *   onInitialized 콜백 안에서 TossAds.attachBanner() 를 호출합니다.
+ *   initialize() 없이 attachBanner()를 직접 호출하면 [toss-ad] 오류가 발생합니다.
+ *
  * @returns destroy 함수 (광고 정리), 미지원 시 null
  */
 export function attachMainBannerAd(target: HTMLElement): (() => void) | null {
-  try {
-    if (!isBannerAdSupportedSync()) return null;
+  if (!isBannerAdSupportedSync()) return null;
 
-    const slot = TossAds.attachBanner(AD_GROUP_BANNER, target, {
-      theme: 'auto',
-      variant: 'expanded',   // 피드형(native image) 광고에 적합한 인라인 확장 레이아웃
-      tone: 'blackAndWhite', // 문서 기본값(SDK 기준)에 맞춤
-    });
+  let slot: TossAdsAttachBannerResult | null = null;
+  let destroyed = false;
 
-    return () => {
-      try {
-        slot.destroy();
-      } catch {
-        // 광고 정리 실패는 무시
-      }
-    };
-  } catch {
-    return null;
-  }
+  // Step 1: SDK 초기화 (toss-ads-space-kit JS 동적 로드)
+  TossAds.initialize({
+    callbacks: {
+      onInitialized: () => {
+        if (destroyed) return; // 컴포넌트 언마운트 후 초기화 완료 시 무시
+        try {
+          // Step 2: 배너 광고 부착 (피드형 native image)
+          slot = TossAds.attachBanner(AD_GROUP_BANNER, target, {
+            theme: 'auto',
+            variant: 'expanded',   // 피드형(native image) 광고에 적합한 인라인 확장 레이아웃
+            tone: 'blackAndWhite', // 문서 기본값(SDK 기준)에 맞춤
+          });
+        } catch {
+          // 초기화 후 광고 부착 실패 — 광고 없이 진행
+        }
+      },
+      onInitializationFailed: () => {
+        // SDK 초기화 실패 — 광고 없이 진행
+      },
+    },
+  });
+
+  return () => {
+    destroyed = true;
+    try {
+      slot?.destroy();
+    } catch {
+      // 광고 정리 실패는 무시
+    }
+  };
 }
 
 /**

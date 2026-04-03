@@ -1,9 +1,10 @@
-import React, { lazy, Suspense } from 'react';
+import React, { lazy, Suspense, useEffect } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProviders } from './providers';
 import { AppLayout } from './Layout';
 import { PageLoader } from '@/components/Skeletons';
 import { ROUTES } from './routes';
+import { TossAds } from '@apps-in-toss/web-framework';
 
 /* 정적 import — 메인 청크 */
 import HomePage from '@/pages/Home';
@@ -18,6 +19,20 @@ import SettingsPage from '@/pages/Settings';
 const DebugPage = lazy(() => import('@/pages/Debug'));
 
 export function App() {
+  // 배너 광고 SDK 사전 초기화 (가이드: 앱 최상위 컴포넌트에서 한 번만)
+  // TossAds.initialize()는 toss-ads-space-kit JS를 CDN에서 동적 로드합니다.
+  // SDK가 이미 초기화된 경우 즉시 onInitialized를 호출하며 중복 로드하지 않습니다.
+  useEffect(() => {
+    if (!TossAds.initialize.isSupported()) return;
+    TossAds.initialize({
+      callbacks: {
+        onInitializationFailed: () => {
+          // SDK 사전 초기화 실패 — 광고 없이 진행 (앱 동작에 영향 없음)
+        },
+      },
+    });
+  }, []);
+
   return (
     <AppProviders>
       <HashRouter>

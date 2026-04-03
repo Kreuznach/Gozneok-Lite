@@ -246,18 +246,18 @@ export default function HomePage() {
           </p>
         </section>
 
-        {/* 메인 노출형 광고 — 피드형(native image), 문서 기준 고정 높이 96px */}
-        <section style={{ marginTop: '20px' }}>
+        {/*
+          메인 노출형 광고 — 피드형(native image), 인라인
+          UI 가이드: https://developers-apps-in-toss.toss.im/ads/develop.html
+          - width: 100% 필수
+          - height 미지정 → SDK가 광고 콘텐츠 높이에 맞게 자동 조절
+          - 위아래 여백 8px 이상 (section: marginTop 20px, marginBottom 8px)
+          - 컨테이너 안에 borderRadius·overflow:hidden 금지 (광고 콘텐츠 클리핑 방지)
+        */}
+        <section style={{ marginTop: '20px', marginBottom: '8px' }}>
           <div
             ref={setBannerHost}
-            style={{
-              width: '100%',
-              minHeight: '96px',
-              borderRadius: '12px',
-              background: '#f8fafc',
-              border: '1px solid #eef1f4',
-              overflow: 'hidden',
-            }}
+            style={{ width: '100%' }}
           />
         </section>
 
