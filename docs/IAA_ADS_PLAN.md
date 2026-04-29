@@ -82,8 +82,14 @@
 
 ```
 [App.tsx — 앱 시작 시 한 번, 가이드 ✅ 좋은 예]
-TossAds.initialize.isSupported()?
-  └─ true → TossAds.initialize({ onInitializationFailed })  // SDK 사전 로드 시작
+try {
+  TossAds.initialize.isSupported()?
+    └─ true  → TossAds.initialize({ onInitializationFailed })  // SDK 사전 로드 시작
+    └─ false → 리턴 (광고 없이 진행)
+} catch {
+  // Toss App WebView 외부(브라우저/로컬 개발)에서는 예외 발생 → 무시
+}
+※ isSupported()는 Toss 앱 native bridge 없이 호출하면 에러를 throw하므로 try-catch 필수
 
 [Home 컴포넌트 — bannerHost ref 설정 후]
 attachMainBannerAd(target)

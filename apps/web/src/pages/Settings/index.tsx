@@ -5,14 +5,15 @@
  *   버전 항목을 5회 연속 탭 → "개발자 메뉴" 링크 토글
  *   (localStorage 'gz_debug_enabled' 으로 상태 유지)
  */
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '@/components/PageHeader';
 import { memoryCache } from '@/lib/cache';
-import { clearAllCache } from '@/lib/storage';
-import { isAdSupported } from '@/lib/admob';
+import { clearAllCache, clearAllUserData } from '@/lib/storage';
+import { isAdSupported, attachMainBannerAd } from '@/lib/admob';
 import { APP_DISPLAY_NAME, APP_VERSION } from '@/types/constants';
 import { ROUTES } from '@/app/routes';
+import { useWishlist } from '@/lib/wishlistContext';
 
 const DEBUG_ENABLED_KEY = 'gz_debug_enabled';
 const UNLOCK_TAPS = 5;
@@ -70,7 +71,10 @@ function SettingsRow({
 export default function SettingsPage() {
   const navigate = useNavigate();
   const [cacheCleared, setCacheCleared] = useState(false);
+  const [dataCleared, setDataCleared] = useState(false);
   const [adSupported, setAdSupported] = useState<boolean | null>(null);
+  const [bannerHost, setBannerHost] = useState<HTMLDivElement | null>(null);
+  const { wishlist } = useWishlist();
 
   // 개발자 메뉴 활성화 상태
   const [debugEnabled, setDebugEnabled] = useState(
@@ -82,11 +86,26 @@ export default function SettingsPage() {
   // 탭 힌트 표시 ('3번 더' 등)
   const [tapHint, setTapHint] = useState<string | null>(null);
 
+  // 광고 배너 부착
+  useEffect(() => {
+    if (!bannerHost) return;
+    const destroy = attachMainBannerAd(bannerHost);
+    return () => { destroy?.(); };
+  }, [bannerHost]);
+
   const handleClearCache = useCallback(() => {
     memoryCache.clear();
     clearAllCache();
     setCacheCleared(true);
     setTimeout(() => setCacheCleared(false), 2000);
+  }, []);
+
+  const handleClearAllData = useCallback(() => {
+    if (!window.confirm('위시리스트 데이터와 쾐시가 모두 삭제됩니다.\n이 작업은 되돌릴 수 없습니다. 계속하시겠습니까?')) return;
+    memoryCache.clear();
+    clearAllUserData();
+    setDataCleared(true);
+    setTimeout(() => setDataCleared(false), 2000);
   }, []);
 
   const handleCheckAd = useCallback(async () => {
@@ -154,6 +173,27 @@ export default function SettingsPage() {
           />
         </section>
 
+        {/* 개인 데이터 */}
+        <section style={{ marginBottom: '8px' }}>
+          <p style={sectionLabel}>개인 데이터</p>
+          <SettingsRow
+            label="저장된 위시리스트"
+            value={`${wishlist.length}개 저장됨 · 기기 로컴 데이터`}
+          />
+          <SettingsRow
+            label="전체 데이터 초기화"
+            value={
+              dataCleared
+                ? '✅ 삭제 완료'
+                : '위시리스트 및 캐시를 모두 삭제합니다'
+            }
+            action={{ label: '전체 삭제', onClick: handleClearAllData, danger: true }}
+          />
+          <p style={{ fontSize: '12px', color: '#b0b8c1', marginTop: '8px' }}>
+            공개키 기반의 플레이스 정보는 기기에 저장되며, 서버로 전송되지 않습니다.
+          </p>
+        </section>
+
         {/* 위치 */}
         <section style={{ marginBottom: '8px' }}>
           <p style={sectionLabel}>권한</p>
@@ -209,6 +249,14 @@ export default function SettingsPage() {
             />
           </section>
         )}
+
+        {/* 하단 배너 광고 (마이페이지) */}
+        <section style={{ marginTop: '24px', marginBottom: '8px' }}>
+          <div
+            ref={setBannerHost}
+            style={{ width: '100%' }}
+          />
+        </section>
       </div>
     </div>
   );

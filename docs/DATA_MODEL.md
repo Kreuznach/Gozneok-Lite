@@ -1,6 +1,95 @@
 # 데이터 모델 — Gozneok Lite
 
-> 최종 갱신: v0.1.1 (2026-03-07)
+> 최종 갱신: v0.1.1 (2026-04-29)
+
+## 개요
+
+- MVP는 익명 사용자 기준 (deviceId = localStorage UUID)
+- **위시리스트·개인설정은 localStorage 전용** (서버 저장 없음, Supabase 미사용)
+- 플레이스 데이터는 TourAPI를 직접 호출하며 메모리 캐시 사용
+- 서버 DB(Supabase 등) 의존도 = 0
+
+---
+
+## localStorage 키 목록 (클라이언트)
+
+| 키 | 타입 | 설명 | 상태 |
+|----|------|------|------|
+| `gz_device_id` | `string` | UUID (기기 식별자, 영구 유지) | ✅ 활성 |
+| `gz_wishlist` | `WishlistItem[]` | 위시리스트 배열 | ✅ 활성 |
+| `gz_cache_*` | any | TourAPI 응답 메모리 캐시 | ✅ 활성 |
+| `gz_debug_enabled` | `"true"/"false"` | 개발자 메뉴 활성화 토글 | ✅ 활성 |
+| `gz_votes` | `Record<contentId, {score, votedAt}>` | 투표 이력 (쿨다운용) | 🔜 v2 예정 |
+| `gz_user_profile` | `UserProfile` | 최소 사용자 정보 (선호 지역/시간대 등) | 🔜 v2 예정 |
+
+---
+
+## 데이터 초기화 (설정 화면)
+
+설정 > 개인 데이터 섹션에서 다음 항목을 초기화할 수 있습니다:
+
+| 기능 | 대상 | 초기화 함수 |
+|------|------|------------|
+| 캐시 초기화 | `gz_cache_*` 키 전체 | `clearAllCache()` |
+| 전체 데이터 초기화 | `gz_wishlist` + `gz_cache_*` | `clearAllUserData()` |
+
+> `gz_device_id`는 기기 식별에 필요하므로 항상 유지됩니다.
+
+---
+
+## WishlistItem 타입
+
+```ts
+export interface WishlistItem {
+  contentId: string;
+  title: string;
+  addr1: string;
+  firstimage?: string;
+  savedAt: number;  // timestamp (ms)
+}
+```
+
+---
+
+## [v2 준비] 사용자 프로파일 (로컬 전용)
+
+```ts
+export interface UserProfile {
+  deviceId: string;
+  preferredAreas?: AreaCode[];
+  preferredTimeSlot?: TimeSlot;
+  onboardedAt: number;   // timestamp (ms)
+  lastActiveAt: number;  // timestamp (ms)
+}
+```
+
+---
+
+## 보안 가이드
+
+| 항목 | 규칙 |
+|------|------|
+| TourAPI serviceKey | 공공데이터포털 공개키 — 클라이언트 포함 허용, `VITE_TOUR_API_KEY` 환경변수 우선 |
+| deviceId | 클라이언트 생성 UUID — 개인정보 아님 |
+| 서버 비밀키 | 현재 서버 없음 (Supabase 미사용) |
+
+---
+
+## 확장 단계 항목 (MVP 제외)
+- 투표 기능 v2 (deviceId 기반 쿨다운, 집계 서버 연동)
+- Wishlist 서버 동기화 (로그인 연동)
+- 베이지안 평점 집계 (PlaceRating)
+
+---
+
+## 변경 이력
+
+| 버전 | 날짜 | 변경 내용 |
+|------|------|----------|
+| v0.1.0 | MVP | 초기 스키마 (place, vote, feedback, wishlist) |
+| v0.1.1 | 2026-03-07 | v2 준비 스키마 추가 (UserProfile, PlaceRating), localStorage 키 테이블 갱신 |
+| v0.1.1 | 2026-04-29 | Supabase 의존도 제거, localStorage 전용 구조 확정, 데이터 초기화 UI 추가 반영 |
+
 
 ## 개요
 

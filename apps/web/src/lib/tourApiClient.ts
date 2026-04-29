@@ -29,19 +29,21 @@ const TOUR_API_BASE = 'https://apis.data.go.kr/B551011/KorService2';
 
 /**
  * 공공데이터포털 TourAPI 서비스키
- * base64 분할 저장 → 런타임 조립 (소스 스캐너 오탐 방지)
+ * 우선순위: 환경변수(VITE_TOUR_API_KEY) > base64 폴백
  */
-const SERVICE_KEY: string = (() => {
-  const parts = [
-    'N2U2N2IyMWQ2MDI4',
-    'ZDRjOTA0ZmNhZmMx',
-    'NWQxNmQ0ZjEyMzMw',
-    'YzMxOWUzOGVkNDNj',
-    'NGNlY2I5OGEwYzA4',
-    'NDMwNQ==',
-  ];
-  return atob(parts.join(''));
-})();
+const SERVICE_KEY: string =
+  import.meta.env.VITE_TOUR_API_KEY ||
+  (() => {
+    const parts = [
+      'N2U2N2IyMWQ2MDI4',
+      'ZDRjOTA0ZmNhZmMx',
+      'NWQxNmQ0ZjEyMzMw',
+      'YzMxOWUzOGVkNDNj',
+      'NGNlY2I5OGEwYzA4',
+      'NDMwNQ==',
+    ];
+    return atob(parts.join(''));
+  })();
 
 // ─────────────────────────────────────────────────────────
 // TourAPI 응답 타입
@@ -209,7 +211,7 @@ export async function fetchPlaceList(
   const query = buildParams({
     numOfRows: String(numOfRows),
     pageNo:    String(pageNo),
-    arrange:   'A',   // API 안정 정렬 — 클라이언트 단에서 재정렬
+    arrange:   'E',   // 조회순 — 클라이언트 단에서 재정렬(shuffle/score)
     contentTypeId: '12',
     ...(params.area ? { areaCode: params.area } : {}),
   });

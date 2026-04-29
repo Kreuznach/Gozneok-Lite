@@ -83,12 +83,33 @@ export function isInWishlist(contentId: string): boolean {
 }
 
 // ────────────────────────────────────────────────────────
-// 캐시 리셋 (Setting 페이지용)
+// 리셋 유틸 (Setting 페이지용)
 // ────────────────────────────────────────────────────────
 
+/** 임시 캐시만 제거 (deviceId·wishlist 유지) */
 export function clearAllCache(): void {
   try {
     // deviceId, wishlist, votes는 유지 — 앱 데이터 캐시만 제거
+    const keysToRemove: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith('gz_cache_')) {
+        keysToRemove.push(k);
+      }
+    }
+    keysToRemove.forEach((k) => localStorage.removeItem(k));
+  } catch {
+    /* 무시 */
+  }
+}
+
+/**
+ * 모든 개인 데이터 초기화 (위시리스트 + 캐시)
+ * deviceId 는 기기 식별에 필요하므로 유지합니다.
+ */
+export function clearAllUserData(): void {
+  try {
+    localStorage.removeItem(KEYS.WISHLIST);
     const keysToRemove: string[] = [];
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i);

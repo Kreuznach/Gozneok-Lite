@@ -1,25 +1,71 @@
-# API 프록시 및 캐시 전략 — Gozneok Lite
+# API 호출 및 캐시 전략 — Gozneok Lite
+
+> 최종 갱신: v0.1.1 (2026-04-29)
+>
+> **아키텍처 변경**: 프록시 서버 없음 — 클라이언트에서 TourAPI 직접 호출
 
 ## 구조
 
 ```
 [Toss WebView (apps/web)]
-        ↓ /api/*
-[프록시 서버 (apps/api)]
-        ↓ serviceKey (ENV)
-[TourAPI KorService2]
+        ↓ 직접 호출
+[TourAPI KorService2 (apis.data.go.kr)]
 ```
 
-- 클라이언트는 프록시 서버(`/api`)만 호출
-- TourAPI serviceKey는 서버 `process.env`에서만 읽음
-- 클라이언트 번들에 키 포함 절대 금지
+- **별도 프록시 서버 없음** — `apps/web/src/lib/tourApiClient.ts`에서 직접 호출
+- TourAPI serviceKey는 공공데이터포털 공개키로 클라이언트 포함 허용
+- 환경변수 `VITE_TOUR_API_KEY` 우선 사용, 미설정 시 내장 폴백 키 사용
+- **Supabase 미사용** (DB 의존도 = 0)
 
 ---
 
-## 프록시 엔드포인트
+## TourAPI 직접 호출 엔드포인트
 
-### GET `/api/places`
-장소 목록 조회 (TourAPI `areaBasedList2`)
+| 기능 | TourAPI 엔드포인트 | 정렬 파라미터 |
+|------|-------------------|--------------|
+| 장소 목록 | `areaBasedList2` | `arrange=E` (조회순) + 클라이언트 Fisher-Yates shuffle |
+| 장소 상세 | `detailCommon2` | — |
+| 장소 이미지 | `detailImage2` | — |
+
+### 장소 목록 정렬 전략
+- API 호출 시 `arrange=E` (조회순) 사용 — 알파벳순(`A`) 회피
+- 클라이언트 초기 로드 시 Fisher-Yates 셔플 적용
+- UI 정렬 모드: 인기순(랜덤·기본) / 이름 ▲ / 이름 ▼ / 거리순
+
+---
+
+## 캐시 전략
+
+| 항목 | TTL | 저장 위치 |
+|------|-----|-----------|
+| 장소 목록 | 15분 | 클라이언트 메모리 캐시 |
+| 장소 상세 | 2시간 | 클라이언트 메모리 캐시 |
+| 장소 이미지 | 6시간 | 클라이언트 메모리 캐시 |
+
+**구현 방식**:
+- 클라이언트: `apps/web/src/lib/cache.ts` — 인메모리 Map 기반 TTL 캐시
+- 설정 > 데이터 섹션에서 수동 초기화 가능 (`clearAllCache()`)
+
+---
+
+## 더미 데이터 폴백
+
+| 조건 | 동작 |
+|------|------|
+| TourAPI 오류 발생 | 더미 폴백 자동 반환 + `isFallback: true` |
+| CORS 오류 등 네트워크 장애 | UI 에러 상태 표시 + 재시도 버튼 |
+
+- UI 안내: "현재 데이터 연결이 불안정해 기본 추천을 보여드려요"
+
+---
+
+## 변경 이력
+
+| 버전 | 날짜 | 변경 내용 |
+|------|------|----------|
+| v0.1.0 | MVP | 프록시 서버 구조 설계 |
+| v0.1.1 | 2026-04-29 | 프록시 서버 제거, 클라이언트 직접 호출 구조 확정, Supabase 의존도 제거 |
+
 
 | 파라미터 | 타입 | 필수 | 설명 |
 |----------|------|------|------|

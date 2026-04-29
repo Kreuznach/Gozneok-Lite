@@ -22,15 +22,20 @@ export function App() {
   // 배너 광고 SDK 사전 초기화 (가이드: 앱 최상위 컴포넌트에서 한 번만)
   // TossAds.initialize()는 toss-ads-space-kit JS를 CDN에서 동적 로드합니다.
   // SDK가 이미 초기화된 경우 즉시 onInitialized를 호출하며 중복 로드하지 않습니다.
+  // ※ isSupported()는 Toss 앱 WebView 외부(브라우저/로컬 개발)에서 예외를 throw하므로 try-catch 필수
   useEffect(() => {
-    if (!TossAds.initialize.isSupported()) return;
-    TossAds.initialize({
-      callbacks: {
-        onInitializationFailed: () => {
-          // SDK 사전 초기화 실패 — 광고 없이 진행 (앱 동작에 영향 없음)
+    try {
+      if (!TossAds.initialize.isSupported()) return;
+      TossAds.initialize({
+        callbacks: {
+          onInitializationFailed: () => {
+            // SDK 사전 초기화 실패 — 광고 없이 진행 (앱 동작에 영향 없음)
+          },
         },
-      },
-    });
+      });
+    } catch {
+      // Toss 앱 WebView 외부(브라우저, 로컬 개발 등)에서는 SDK 미지원 — 광고 없이 진행
+    }
   }, []);
 
   return (

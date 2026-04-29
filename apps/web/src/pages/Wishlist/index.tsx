@@ -1,12 +1,13 @@
 /**
  * Wishlist/index.tsx — 위시리스트 화면
  */
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWishlist } from '@/lib/wishlistContext';
 import { PageHeader } from '@/components/PageHeader';
 import { EmptyState } from '@/components/EmptyState';
 import { toPlaceDetail } from '@/app/routes';
+import { attachMainBannerAd } from '@/lib/admob';
 import type { WishlistItem } from '@/types';
 
 function WishlistCard({
@@ -115,6 +116,13 @@ function WishlistCard({
 export default function WishlistPage() {
   const navigate = useNavigate();
   const { wishlist, remove } = useWishlist();
+  const [bannerHost, setBannerHost] = useState<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!bannerHost) return;
+    const destroy = attachMainBannerAd(bannerHost);
+    return () => { destroy?.(); };
+  }, [bannerHost]);
 
   return (
     <div>
@@ -141,6 +149,12 @@ export default function WishlistPage() {
             ))}
           </>
         )}
+
+        {/* 하단 배너 광고 (마이페이지 하단) */}
+        <div
+          ref={setBannerHost}
+          style={{ width: '100%', marginTop: '24px' }}
+        />
       </div>
     </div>
   );
