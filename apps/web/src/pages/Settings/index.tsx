@@ -3,7 +3,7 @@
  *
  * 숨겨진 개발자 메뉴 진입:
  *   버전 항목을 5회 연속 탭 → "개발자 메뉴" 링크 토글
- *   (localStorage 'gz_debug_enabled' 으로 상태 유지)
+ *   (localStorage 'gz_debug_enabled'로 상태 유지)
  */
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -101,7 +101,7 @@ export default function SettingsPage() {
   }, []);
 
   const handleClearAllData = useCallback(() => {
-    if (!window.confirm('위시리스트 데이터와 쾐시가 모두 삭제됩니다.\n이 작업은 되돌릴 수 없습니다. 계속하시겠습니까?')) return;
+    if (!window.confirm('위시리스트 데이터와 캐시가 모두 삭제됩니다.\n이 작업은 되돌릴 수 없습니다. 계속하시겠습니까?')) return;
     memoryCache.clear();
     clearAllUserData();
     setDataCleared(true);
@@ -149,7 +149,7 @@ export default function SettingsPage() {
           {/* 버전 항목 — 5회 탭으로 개발자 메뉴 토글 */}
           <SettingsRow
             label="버전"
-            value={`v${APP_VERSION}${tapHint ? '' : ''}`}
+            value={`v${APP_VERSION}`}
             onLabelClick={handleVersionTap}
           />
           {tapHint && (
@@ -160,6 +160,10 @@ export default function SettingsPage() {
           <SettingsRow
             label="데이터 출처"
             value="한국관광공사 TourAPI (공공데이터포털)"
+          />
+          <SettingsRow
+            label="마지막 업데이트"
+            value="2026. 05. 08. 한글 표기 수정"
           />
         </section>
 
@@ -178,7 +182,7 @@ export default function SettingsPage() {
           <p style={sectionLabel}>개인 데이터</p>
           <SettingsRow
             label="저장된 위시리스트"
-            value={`${wishlist.length}개 저장됨 · 기기 로컴 데이터`}
+            value={`${wishlist.length}개 저장됨 · 기기 로컬 데이터`}
           />
           <SettingsRow
             label="전체 데이터 초기화"
