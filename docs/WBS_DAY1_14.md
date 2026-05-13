@@ -111,6 +111,20 @@
 - [x] **DATA_MODEL.md 갱신**: v2 SQL 스키마 및 localStorage 키 테이블 업데이트
 
 
+## v0.1.3 업데이트 (2026-05-08)
+
+### 변경 사항
+- [x] **한글 오탈자 수정**: `쾐시` → `캐시`, `로컴` → `로컬` (Settings/index.tsx)
+- [x] **한글 맞춤법 수정**: `'gz_debug_enabled' 으로` → `'gz_debug_enabled'로` (조사 교정)
+- [x] **버전 업그레이드**: v0.1.1 → v0.1.3 (constants.ts, package.json 루트/web)
+- [x] **설정 화면 업데이트 내역 추가**: '마지막 업데이트' 항목 신설 (앱 정보 섹션)
+- [x] **불필요한 코드 제거**: `${tapHint ? '' : ''}` 삼항 연산자 제거 (항상 빈 문자열 반환)
+- [x] **빌드 성공**: 68 modules, gzip ~73 KB
+- [x] **README.md 신규 생성**: 배포 가이드, 명령어 레퍼런스, 환경변수 표 포함
+- [x] **build:ait 스크립트 추가**: `npm run build:ait` → 웹 빌드 + `npx ait build` 순서 실행
+- [x] **AIT 아티팩트 빌드**: `gozneok-lite.ait` 갱신 (deploymentId: 019e0773-137f-7f9a-966d-397952ce45fa)
+
+
 ## 완료 기준
 
 - [ ] 샌드박스 전체 플로우 통과 (실기기 테스트 — 파트너 등록 후 진행)

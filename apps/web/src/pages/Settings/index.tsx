@@ -70,7 +70,7 @@ export default function SettingsPage() {
   }, []);
 
   const handleClearAllData = useCallback(() => {
-    if (!window.confirm('위시리스트 데이터와 쾐시가 모두 삭제됩니다.\n이 작업은 되돌릴 수 없습니다. 계속하시겠습니까?')) return;
+    if (!window.confirm('위시리스트 데이터와 캐시가 모두 삭제됩니다.\n이 작업은 되돌릴 수 없습니다. 계속하시겠습니까?')) return;
     memoryCache.clear();
     clearAllUserData();
     setDataCleared(true);
@@ -93,6 +93,10 @@ export default function SettingsPage() {
             label="데이터 출처"
             value="한국관광공사 TourAPI (공공데이터포털)"
           />
+          <SettingsRow
+            label="마지막 업데이트"
+            value="2026. 05. 08. 한글 표기 수정"
+          />
         </section>
 
         {/* 데이터 */}
@@ -110,7 +114,7 @@ export default function SettingsPage() {
           <p style={sectionLabel}>개인 데이터</p>
           <SettingsRow
             label="저장된 위시리스트"
-            value={`${wishlist.length}개 저장됨 · 기기 로컴 데이터`}
+            value={`${wishlist.length}개 저장됨 · 기기 로컬 데이터`}
           />
           <SettingsRow
             label="전체 데이터 초기화"
