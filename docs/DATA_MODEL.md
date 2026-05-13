@@ -18,7 +18,6 @@
 | `gz_device_id` | `string` | UUID (기기 식별자, 영구 유지) | ✅ 활성 |
 | `gz_wishlist` | `WishlistItem[]` | 위시리스트 배열 | ✅ 활성 |
 | `gz_cache_*` | any | TourAPI 응답 메모리 캐시 | ✅ 활성 |
-| `gz_debug_enabled` | `"true"/"false"` | 개발자 메뉴 활성화 토글 | ✅ 활성 |
 | `gz_votes` | `Record<contentId, {score, votedAt}>` | 투표 이력 (쿨다운용) | 🔜 v2 예정 |
 | `gz_user_profile` | `UserProfile` | 최소 사용자 정보 (선호 지역/시간대 등) | 🔜 v2 예정 |
 
@@ -175,7 +174,6 @@ CREATE TABLE wishlist (
 | `gz_user_profile` | `UserProfile` | 최소 사용자 정보 (선호 지역/시간대, 첫 진입일 등) | 🔜 v2 예정 |
 | `gz_place_ratings` | `Record<contentId, PlaceRating>` | 장소 평점 로컬 캐시 | 🔜 v2 예정 |
 | `gz_cache_*` | any | 앱 데이터 캐시 | ✅ 활성 |
-| `gz_debug_use_dummy` | `"true"/"false"` | 디버그 더미 토글 | ✅ 활성 |
 
 ---
 

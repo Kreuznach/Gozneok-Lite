@@ -10,7 +10,7 @@
 
 ### 2. 앱 구성
 - [x] iframe 미사용 확인
-- [x] 외부 링크: "길찾기(카카오맵)" 1개만 (PlaceDetail target="_blank" 1건 확인)
+- [x] 외부 링크: 길찾기(카카오맵/네이버지도) 2개만 (PlaceDetail target="_blank" 2건 확인)
 - [x] 다크모드 강제 해제 (`color-scheme: light` — meta + global.css 적용)
 - [x] `granite.config.ts` 정확히 작성 (brand.primaryColor/icon placeholder, permissions 객체형 — Day 10 완료)
 - [x] `appName: 'gozneok-lite'` 확인
@@ -35,7 +35,7 @@
 
 ### 6. 성능/번들
 - [x] 무거운 라이브러리 미포함 (@toss/tds-mobile 제거, Redux/Zustand 미사용)
-- [x] Debug 페이지: 동적 import로 분리 (프로덕션 숨김 — lazy() + import.meta.env.DEV)
+- [x] Debug 페이지: 제거 (설정 화면에서 개발자 메뉴 및 광고 지원 여부 확인 기능 함께 제거)
 - [x] 이미지 `loading="lazy"` 적용 (PlaceCard, PlaceDetail 모두 적용)
 - [x] 번들 크기 확인 — 총 gzip ~64KB (`vite build` 확인 완료)
 
@@ -61,8 +61,9 @@
 3. Home → 위치 허용/거부 → 장소 목록 → 상세 → 위시리스트
 4. 위치 거부 → Region Select → 장소 목록
 5. 더미 데이터 모드 ON → 폴백 배너 확인
-6. 광고 isSupported 확인 (설정 → 광고 지원 여부)
-7. 캐시 초기화 → 재로드
+6. 장소 상세 → 썸네일 클릭 시 메인 이미지 교체 확인
+7. 장소 상세 → 길찾기 버튼 (카카오맵 / 네이버지도) 각각 외부 앱 이동 확인
+8. 캐시 초기화 → 재로드
 
 > ~~투표 → 위시리스트 플로우~~: 투표 기능 v2 이후 추가 예정
 

@@ -20,6 +20,8 @@ export default function PlaceDetailPage() {
   const [images, setImages] = useState<PlaceImage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  /** 현재 메인 이미지로 표시 중인 인덱스 */
+  const [selectedIndex, setSelectedIndex] = useState(0);
   /** 이미지 미리보기 모달: 열린 이미지의 인덱스, null이면 닫힘 */
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
 
@@ -118,15 +120,15 @@ export default function PlaceDetailPage() {
           height: '240px',
           background: '#f2f4f6',
           overflow: 'hidden',
-          cursor: displayImages[0] ? 'zoom-in' : 'default',
+          cursor: displayImages[selectedIndex] ? 'zoom-in' : 'default',
         }}
-        onClick={() => displayImages[0] && setViewerIndex(0)}
-        role={displayImages[0] ? 'button' : undefined}
-        aria-label={displayImages[0] ? '이미지 크게 보기' : undefined}
+        onClick={() => displayImages[selectedIndex] && setViewerIndex(selectedIndex)}
+        role={displayImages[selectedIndex] ? 'button' : undefined}
+        aria-label={displayImages[selectedIndex] ? '이미지 크게 보기' : undefined}
       >
-        {displayImages[0] ? (
+        {displayImages[selectedIndex] ? (
           <img
-            src={displayImages[0]}
+            src={displayImages[selectedIndex]}
             alt={detail.title}
             loading="lazy"
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
@@ -165,14 +167,16 @@ export default function PlaceDetailPage() {
               src={url}
               alt=""
               loading="lazy"
-              onClick={() => setViewerIndex(i + 1)}
+              onClick={() => setSelectedIndex(i + 1)}
               style={{
                 flexShrink: 0,
                 width: '80px',
                 height: '60px',
                 objectFit: 'cover',
                 borderRadius: '8px',
-                cursor: 'zoom-in',
+                cursor: 'pointer',
+                outline: selectedIndex === i + 1 ? '2px solid #3182f6' : 'none',
+                outlineOffset: '2px',
               }}
             />
           ))}
@@ -243,27 +247,49 @@ export default function PlaceDetailPage() {
           </section>
         )}
 
-        {/* 길찾기 버튼 (외부 링크 1개만) */}
-        <a
-          href={`https://map.kakao.com/link/map/${encodeURIComponent(detail.title)},${detail.mapy},${detail.mapx}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            display: 'block',
-            width: '100%',
-            padding: '15px',
-            borderRadius: '12px',
-            background: '#f2f4f6',
-            color: '#191f28',
-            fontSize: '15px',
-            fontWeight: 600,
-            textAlign: 'center',
-            textDecoration: 'none',
-            boxSizing: 'border-box',
-          }}
-        >
-          🗺️ 길찾기 (카카오맵)
-        </a>
+        {/* 길찾기 버튼 */}
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <a
+            href={`https://map.kakao.com/link/map/${encodeURIComponent(detail.title)},${detail.mapy},${detail.mapx}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              flex: 1,
+              display: 'block',
+              padding: '15px',
+              borderRadius: '12px',
+              background: '#f2f4f6',
+              color: '#191f28',
+              fontSize: '14px',
+              fontWeight: 600,
+              textAlign: 'center',
+              textDecoration: 'none',
+              boxSizing: 'border-box',
+            }}
+          >
+            🗺️ 카카오맵
+          </a>
+          <a
+            href={`https://map.naver.com/v5/directions/-/-/${encodeURIComponent(detail.addr1 || detail.title)}/walk`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              flex: 1,
+              display: 'block',
+              padding: '15px',
+              borderRadius: '12px',
+              background: '#e8f5e9',
+              color: '#1b5e20',
+              fontSize: '14px',
+              fontWeight: 600,
+              textAlign: 'center',
+              textDecoration: 'none',
+              boxSizing: 'border-box',
+            }}
+          >
+            🗺️ 네이버지도
+          </a>
+        </div>
         <p style={{ fontSize: '11px', color: '#b0b8c1', textAlign: 'center', marginTop: '6px' }}>
           외부 앱으로 이동합니다
         </p>

@@ -15,9 +15,6 @@ import PlaceDetailPage from '@/pages/PlaceDetail';
 import WishlistPage from '@/pages/Wishlist';
 import SettingsPage from '@/pages/Settings';
 
-/* Debug 페이지: 동적 import → 프로덕션 빌드에서 별도 청크로 분리 */
-const DebugPage = lazy(() => import('@/pages/Debug'));
-
 export function App() {
   // 배너 광고 SDK 사전 초기화 (가이드: 앱 최상위 컴포넌트에서 한 번만)
   // TossAds.initialize()는 toss-ads-space-kit JS를 CDN에서 동적 로드합니다.
@@ -51,8 +48,6 @@ export function App() {
               <Route path={ROUTES.PLACE_DETAIL} element={<PlaceDetailPage />} />
               <Route path={ROUTES.WISHLIST} element={<WishlistPage />} />
               <Route path={ROUTES.SETTINGS} element={<SettingsPage />} />
-              {/* Debug: 항상 라우트 등록 — 설정 탭에서 활성화해야 진입 링크 표시 */}
-              <Route path={ROUTES.DEBUG} element={<DebugPage />} />
               <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
             </Routes>
           </Suspense>

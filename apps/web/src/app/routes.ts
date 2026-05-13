@@ -10,7 +10,6 @@ export const ROUTES = {
   PLACE_DETAIL: '/places/:contentId',
   WISHLIST: '/wishlist',
   SETTINGS: '/settings',
-  DEBUG: '/debug',
 } as const;
 
 export type RouteKey = keyof typeof ROUTES;
