@@ -270,7 +270,7 @@ export default function PlaceDetailPage() {
             🗺️ 카카오맵
           </a>
           <a
-            href={`https://map.naver.com/v5/directions/-/-/${encodeURIComponent(detail.addr1 || detail.title)}/walk`}
+            href={`nmap://place?lat=${detail.mapy}&lng=${detail.mapx}&name=${encodeURIComponent(detail.title)}&appname=gozneok-lite`}
             target="_blank"
             rel="noopener noreferrer"
             style={{
