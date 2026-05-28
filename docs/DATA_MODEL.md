@@ -1,6 +1,6 @@
 # 데이터 모델 — Gozneok Lite
 
-> 최종 갱신: v0.1.1 (2026-04-29)
+> 최종 갱신: v0.1.3 (2026-05-28)
 
 ## 개요
 
@@ -88,6 +88,7 @@ export interface UserProfile {
 | v0.1.0 | MVP | 초기 스키마 (place, vote, feedback, wishlist) |
 | v0.1.1 | 2026-03-07 | v2 준비 스키마 추가 (UserProfile, PlaceRating), localStorage 키 테이블 갱신 |
 | v0.1.1 | 2026-04-29 | Supabase 의존도 제거, localStorage 전용 구조 확정, 데이터 초기화 UI 추가 반영 |
+| v0.1.3 | 2026-05-28 | firstimage2 컬럼 용도 주석 추가 (UI는 firstimage 원본 사용으로 변경) |
 
 
 ## 개요
@@ -115,8 +116,8 @@ CREATE TABLE place (
   area_code       TEXT,
   mapx            DOUBLE PRECISION,
   mapy            DOUBLE PRECISION,
-  firstimage      TEXT,
-  firstimage2     TEXT,
+  firstimage      TEXT,           -- 원본 이미지 URL (목록 카드 표시에 사용)
+  firstimage2     TEXT,           -- 썸네일 URL (TourAPI 제공, UI 미사용)
   tel             TEXT,
   overview        TEXT,
   synced_at       TIMESTAMPTZ DEFAULT NOW()

@@ -52,7 +52,7 @@ export function PlaceCard({
       <div style={{ position: 'relative', height: '180px', background: '#f2f4f6' }}>
         {place.firstimage ? (
           <img
-            src={place.firstimage2 ?? place.firstimage}
+            src={place.firstimage}
             alt={place.title}
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             loading="lazy"
