@@ -2,7 +2,7 @@
 
 ## 광고 플랫폼
 - **Apps in Toss AdMob API**
-- **SDK 설치 버전**: `@apps-in-toss/web-framework` `2.1.1` (**2.0 이상 충족**)
+- **SDK 설치 버전**: `@apps-in-toss/web-framework` `3.4.0` (Toss 권장 3.1 이상 충족, 2026-09-10 업데이트)
 - **외부 SDK**: `toss-ads-space-kit-1.3.0.js` (CDN: `https://static.toss.im/ads/sdk/`)  
   → `TossAds.initialize()` 호출 시 자동 동적 로드 (index.html에 preload 힌트 추가됨)
 - **배너 API 참고**:  
@@ -157,7 +157,7 @@ attachMainBannerAd(target)
 
 ## 완료 체크리스트
 
-- [x] SDK 버전 2.0+ 확인 (`@apps-in-toss/web-framework@2.1.1`)
+- [x] SDK 버전 3.1 이상 확인 (`@apps-in-toss/web-framework@3.4.0`, 2026-09-10 업그레이드)
 - [x] 광고 SDK JS 파일: `TossAds.initialize()` 가 `toss-ads-space-kit-1.3.0.js` 동적 로드  
       `index.html` 에 `<link rel="preload">` 힌트 추가
 - [x] 배너 광고 컨테이너: `ref={setBannerHost}`, `width:100%`, height 미지정 (피드형 인라인 가이드 준수)
@@ -165,7 +165,7 @@ attachMainBannerAd(target)
 - [x] `TossAds.initialize()` → `TossAds.attachBanner()` 순서 보장
 - [x] `App.tsx` 최상위에서 SDK 사전 초기화 (가이드 ✅ 좋은 예 준수)
 - [x] localhost 광고 미표시 → 정상 동작 확인 (`isSupported()` = false in browser)
-- [x] `ait build` 완료 (`deploymentId: 019d50f1-dfde-7d42-8888-209606a09714`)
+- [x] `ait build` 완료 (SDK 3.4.0 기준 재빌드, 2026-09-10)
 
 ---
 

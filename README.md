@@ -1,4 +1,4 @@
-# 고요한 산책 (Gozneok Lite) · v0.1.3
+# 고요한 산책 (Gozneok Lite) · v0.1.4
 
 > 지금 조용하게 머물기 좋은 장소를 빠르게 추천해주는 **Apps in Toss** WebView 미니앱
 
@@ -30,7 +30,7 @@
 | 서비스명 | 고요한 산책 (Quiet Walk) |
 | 플랫폼 | Apps in Toss (WebView 미니앱) |
 | 앱 ID | `gozneok-lite` |
-| 현재 버전 | v0.1.3 |
+| 현재 버전 | v0.1.4 |
 | 데이터 출처 | 한국관광공사 TourAPI (공공데이터포털) |
 
 ---
@@ -42,7 +42,7 @@
 | 프레임워크 | React 18 + TypeScript |
 | 번들러 | Vite 5 |
 | 라우팅 | react-router-dom v6 |
-| 미니앱 SDK | @apps-in-toss/web-framework |
+| 미니앱 SDK | @apps-in-toss/web-framework (3.4.0) |
 | API 서버 | Express (Node.js) |
 | 패키지 관리 | pnpm 8 (monorepo) |
 
@@ -56,7 +56,7 @@ gozneok-lite/
 │   ├── web/          # React WebView 프론트엔드
 │   └── api/          # TourAPI 프록시 서버 (Express)
 ├── docs/             # 설계 문서
-├── granite.config.ts # Apps in Toss 미니앱 설정
+├── apps-in-toss.config.ts # Apps in Toss 미니앱 설정 (SDK 3.x)
 ├── gozneok-lite.ait  # 배포 아티팩트 (ait build 결과물)
 └── package.json      # 루트 monorepo 스크립트
 ```
@@ -151,7 +151,7 @@ npm run build:ait
 
 #### Toss 파트너 콘솔 체크리스트
 
-- [ ] `granite.config.ts`의 `brand.icon` URL을 콘솔 발급 URL로 교체
+- [ ] `apps-in-toss.config.ts`의 앱 아이콘·표시 이름을 Toss 파트너 콘솔에서 등록/업로드
 - [ ] `VITE_API_BASE_URL`을 프로덕션 API 주소로 설정
 - [ ] AdMob 그룹 ID를 LIVE 값으로 확인
 - [ ] [REVIEW_CHECKLIST.md](./docs/REVIEW_CHECKLIST.md) 전 항목 통과 확인

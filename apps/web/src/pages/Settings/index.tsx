@@ -95,7 +95,7 @@ export default function SettingsPage() {
           />
           <SettingsRow
             label="마지막 업데이트"
-            value="2026. 05. 08. 한글 표기 수정"
+            value="2026. 09. 10. 앱인토스 SDK 3.4.0 업데이트"
           />
         </section>
 

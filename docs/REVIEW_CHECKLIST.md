@@ -12,7 +12,7 @@
 - [x] iframe 미사용 확인
 - [x] 외부 링크: 길찾기(카카오맵/네이버지도) 2개만 (PlaceDetail target="_blank" 2건 확인)
 - [x] 다크모드 강제 해제 (`color-scheme: light` — meta + global.css 적용)
-- [x] `granite.config.ts` 정확히 작성 (brand.primaryColor/icon placeholder, permissions 객체형 — Day 10 완료)
+- [x] `apps-in-toss.config.ts` 정확히 작성 (brand.primaryColor, permissions 객체형 — SDK 3.4.0 업데이트로 granite.config.ts에서 이름/스키마 변경)
 - [x] `appName: 'gozneok-lite'` 확인
 
 ### 3. 권한

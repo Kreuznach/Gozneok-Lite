@@ -63,7 +63,7 @@
 ## 기술 스택
 | 영역 | 기술 |
 |------|------|
-| 프론트 | Vite + React 18 + TypeScript + `@apps-in-toss/web-framework` 2.x |
+| 프론트 | Vite + React 18 + TypeScript + `@apps-in-toss/web-framework` 3.x |
 | 라우팅 | react-router-dom v6 |
 | 상태 | React Context + Hooks (Redux 없음) |
 | 스타일 | TDS(Toss Design System) + 인라인 스타일 최소화 |
