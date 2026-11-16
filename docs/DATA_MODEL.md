@@ -17,7 +17,9 @@
 |----|------|------|------|
 | `gz_device_id` | `string` | UUID (기기 식별자, 영구 유지) | ✅ 활성 |
 | `gz_wishlist` | `WishlistItem[]` | 위시리스트 배열 | ✅ 활성 |
-| `gz_cache_*` | any | TourAPI 응답 메모리 캐시 | ✅ 활성 |
+| `gz_stamps` | `Stamp[]` | 고요 도장 (장소·지역·날짜·시간대·계절·한 줄 노트) | ✅ 활성 (v0.2.0) |
+| `gz_badges` | `{id, earnedAt}[]` | 받은 배지와 받은 시각 | ✅ 활성 (v0.2.0) |
+| `gz_revisit_card_seen` | `string` (YYYY-MM-DD) | "다시 가 볼까요?" 카드를 닫은 날 | ✅ 활성 (v0.2.0) |
 | `gz_votes` | `Record<contentId, {score, votedAt}>` | 투표 이력 (쿨다운용) | 🔜 v2 예정 |
 | `gz_user_profile` | `UserProfile` | 최소 사용자 정보 (선호 지역/시간대 등) | 🔜 v2 예정 |
 

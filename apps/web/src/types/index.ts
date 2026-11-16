@@ -115,6 +115,30 @@ export interface WishlistItem {
 }
 
 // ────────────────────────────────────────────────────────
+// 고요 도장 / 배지 (재미·재방문 기능, localStorage 전용)
+// ────────────────────────────────────────────────────────
+
+export type StampSlot = Exclude<TimeSlot, 'now'>;
+export type Season = 'spring' | 'summer' | 'autumn' | 'winter';
+
+export interface Stamp {
+  id: string;
+  contentId: string;
+  title: string;
+  areaCode: string;
+  firstimage?: string;
+  visitedAt: number;
+  timeSlot: StampSlot;
+  season: Season;
+  note?: string; // 100자 이하, 나만 보는 메모
+}
+
+export interface BadgeRecord {
+  id: string;
+  earnedAt: number;
+}
+
+// ────────────────────────────────────────────────────────
 // 추천 상태 (RecommendationContext)
 // ────────────────────────────────────────────────────────
 

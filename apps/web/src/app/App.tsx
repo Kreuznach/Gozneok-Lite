@@ -14,6 +14,7 @@ import PlaceListPage from '@/pages/PlaceList';
 import PlaceDetailPage from '@/pages/PlaceDetail';
 import WishlistPage from '@/pages/Wishlist';
 import SettingsPage from '@/pages/Settings';
+import JourneyPage from '@/pages/Journey';
 
 export function App() {
   // 배너 광고 SDK 사전 초기화 (가이드: 앱 최상위 컴포넌트에서 한 번만)
@@ -47,6 +48,7 @@ export function App() {
               <Route path={ROUTES.PLACE_LIST} element={<PlaceListPage />} />
               <Route path={ROUTES.PLACE_DETAIL} element={<PlaceDetailPage />} />
               <Route path={ROUTES.WISHLIST} element={<WishlistPage />} />
+              <Route path={ROUTES.JOURNEY} element={<JourneyPage />} />
               <Route path={ROUTES.SETTINGS} element={<SettingsPage />} />
               <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
             </Routes>

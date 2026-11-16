@@ -9,6 +9,7 @@ export const ROUTES = {
   PLACE_LIST: '/places',
   PLACE_DETAIL: '/places/:contentId',
   WISHLIST: '/wishlist',
+  JOURNEY: '/journey',
   SETTINGS: '/settings',
 } as const;
 

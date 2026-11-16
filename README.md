@@ -1,4 +1,4 @@
-# 고요한 산책 (Gozneok Lite) · v0.1.4
+# 고요한 산책 (Gozneok Lite) · v0.2.0
 
 > 지금 조용하게 머물기 좋은 장소를 빠르게 추천해주는 **Apps in Toss** WebView 미니앱
 
@@ -30,7 +30,7 @@
 | 서비스명 | 고요한 산책 (Quiet Walk) |
 | 플랫폼 | Apps in Toss (WebView 미니앱) |
 | 앱 ID | `gozneok-lite` |
-| 현재 버전 | v0.1.4 |
+| 현재 버전 | v0.2.0 |
 | 데이터 출처 | 한국관광공사 TourAPI (공공데이터포털) |
 
 ---
@@ -194,4 +194,5 @@ npm run build:ait
 | [docs/REVIEW_CHECKLIST.md](./docs/REVIEW_CHECKLIST.md) | Toss 심사 체크리스트 |
 | [docs/WBS_DAY1_14.md](./docs/WBS_DAY1_14.md) | 작업 분류 구조 |
 | [docs/RISKS_AND_DECISIONS_10.md](./docs/RISKS_AND_DECISIONS_10.md) | 리스크 및 결정 10선 |
+| [docs/ENGAGEMENT_AND_REVISIT_IDEAS.md](./docs/ENGAGEMENT_AND_REVISIT_IDEAS.md) | 재미·재방문 기능 (고요 도장·배지·미션) 기획과 구현 결과 |
 | [docs/INDEX.md](./docs/INDEX.md) | 문서 전체 목차 |

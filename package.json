@@ -1,6 +1,6 @@
 {
   "name": "gozneok-lite",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "private": true,
   "description": "고요한 산책 (Quiet Walk) - 조용한 장소 추천 미니앱 (Apps in Toss WebView)",
   "packageManager": "pnpm@8.15.0",

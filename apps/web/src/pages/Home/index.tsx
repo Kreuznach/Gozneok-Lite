@@ -8,6 +8,7 @@ import { ROUTES } from '@/app/routes';
 import { useRecommendation } from '@/lib/recommendationContext';
 import { attachMainBannerAd } from '@/lib/admob';
 import { TimeSlotChips } from '@/components/TimeSlotChips';
+import { HomeJourneyCards } from '@/components/HomeJourneyCards';
 import type { TimeSlot } from '@/types';
 import { APP_DISPLAY_NAME } from '@/types/constants';
 
@@ -164,6 +165,9 @@ export default function HomePage() {
       </div>
 
       <div style={{ padding: '0 20px' }}>
+        {/* 재방문 카드 / 오늘의 고요 한 곳 / 내 고요 기록 */}
+        <HomeJourneyCards />
+
         {/* 시간대 선택 */}
         <section style={{ marginBottom: '28px' }}>
           <h2

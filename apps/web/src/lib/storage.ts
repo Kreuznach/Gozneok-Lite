@@ -4,9 +4,13 @@
  */
 import type { WishlistItem } from '@/types';
 
-const KEYS = {
+export const KEYS = {
   DEVICE_ID: 'gz_device_id',
   WISHLIST: 'gz_wishlist',
+  // 재미·재방문 기능 (고요 도장 / 배지 / 다시 가 볼까요 카드)
+  STAMPS: 'gz_stamps',
+  BADGES: 'gz_badges',
+  REVISIT_SEEN: 'gz_revisit_card_seen',
   // VOTES: 'gz_votes', — 투표 기능 v2 예정, 현재 미사용
   // [v2 준비] 최소 사용자 정보 (onboardedAt, preferredAreas, preferredTimeSlot 등)
   // USER_PROFILE: 'gz_user_profile',
@@ -104,12 +108,15 @@ export function clearAllCache(): void {
 }
 
 /**
- * 모든 개인 데이터 초기화 (위시리스트 + 캐시)
+ * 모든 개인 데이터 초기화 (위시리스트 + 도장·배지 기록 + 캐시)
  * deviceId 는 기기 식별에 필요하므로 유지합니다.
  */
 export function clearAllUserData(): void {
   try {
     localStorage.removeItem(KEYS.WISHLIST);
+    localStorage.removeItem(KEYS.STAMPS);
+    localStorage.removeItem(KEYS.BADGES);
+    localStorage.removeItem(KEYS.REVISIT_SEEN);
     const keysToRemove: string[] = [];
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i);

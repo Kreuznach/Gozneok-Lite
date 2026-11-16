@@ -53,4 +53,4 @@ export const TIME_SLOTS: TimeSlotInfo[] = [
 export const APP_NAME = 'gozneok-lite' as const;
 export const APP_DISPLAY_NAME = '고요한 산책' as const;
 export const APP_ENGLISH_NAME = 'Quiet Walk' as const;
-export const APP_VERSION = '0.1.4' as const;
+export const APP_VERSION = '0.2.0' as const;

@@ -9,6 +9,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { PageLoader } from '@/components/Skeletons';
 import { EmptyState } from '@/components/EmptyState';
 import { ImageViewer } from '@/components/ImageViewer';
+import { StampSection } from '@/components/StampSection';
 import type { PlaceDetail, PlaceImage } from '@/types';
 
 export default function PlaceDetailPage() {
@@ -206,6 +207,9 @@ export default function PlaceDetailPage() {
             📞 {detail.tel}
           </p>
         )}
+
+        {/* 고요 도장 */}
+        <StampSection detail={detail} />
 
         {/* Quiet Score — 잠정 준비 메시지 (평가 기능 v2에서 오픈 예정) */}
         <section

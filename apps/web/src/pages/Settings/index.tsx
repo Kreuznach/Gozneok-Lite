@@ -70,7 +70,7 @@ export default function SettingsPage() {
   }, []);
 
   const handleClearAllData = useCallback(() => {
-    if (!window.confirm('위시리스트 데이터와 캐시가 모두 삭제됩니다.\n이 작업은 되돌릴 수 없습니다. 계속하시겠습니까?')) return;
+    if (!window.confirm('위시리스트, 도장·배지 기록, 캐시가 모두 삭제됩니다.\n이 작업은 되돌릴 수 없습니다. 계속하시겠습니까?')) return;
     memoryCache.clear();
     clearAllUserData();
     setDataCleared(true);
@@ -95,7 +95,7 @@ export default function SettingsPage() {
           />
           <SettingsRow
             label="마지막 업데이트"
-            value="2026. 09. 10. 앱인토스 SDK 3.4.0 업데이트"
+            value="2026. 11. 16. 고요 도장·배지·주간 미션 추가"
           />
         </section>
 
@@ -121,7 +121,7 @@ export default function SettingsPage() {
             value={
               dataCleared
                 ? '✅ 삭제 완료'
-                : '위시리스트 및 캐시를 모두 삭제합니다'
+                : '위시리스트, 도장·배지 기록, 캐시를 모두 삭제합니다'
             }
             action={{ label: '전체 삭제', onClick: handleClearAllData, danger: true }}
           />
